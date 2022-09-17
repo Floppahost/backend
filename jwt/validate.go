@@ -8,9 +8,9 @@ import (
 
 func Validar(tokens string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokens, func(token *jwt.Token) (any, error) {
-		// verificamos se houve erro no método de criptografia
+		// we verify if the cryptography method matches
 		if _, err := token.Method.(*jwt.SigningMethodHMAC); !err {
-			return nil, errors.New("algorítimo inválido")
+			return nil, errors.New("invalid algorithm")
 		}
 		return Secret, nil
 	})

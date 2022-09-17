@@ -19,10 +19,12 @@ func Login(c *fiber.Ctx) error {
 		return err
 	}
 	id, err := database.Login(model.BaseUser{}, parser.Usuario, parser.Senha)
+
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": true, "message": "Dados incorretos.", "data": nil})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": true, "message": "Invalid data.", "data": nil})
 	}
-	token, err := jwt.GenerateUserToken("system", parser.Usuario, id, true)
+
+	token, err := jwt.GenerateUserToken("system", parser.Usuario, id)
 	if err != nil {
 		panic(err)
 	}
@@ -32,6 +34,6 @@ func Login(c *fiber.Ctx) error {
 	cookie.Value = token
 
 	c.Cookie(cookie)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Logado com sucesso.", "data": nil})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Logged in.", "data": nil})
 
 }

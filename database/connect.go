@@ -27,9 +27,9 @@ func Connect() {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("Falha ao conectar ao banco.")
+		panic("Failed to connect to the DB")
 	}
-	fmt.Println("Conectado à database!")
+	fmt.Println("Connected to the DB")
 
 	// migramos o esquema
 	DB.AutoMigrate(&model.BaseUser{})

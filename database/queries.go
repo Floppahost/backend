@@ -10,21 +10,21 @@ import (
 func Login(database any, usuario string, senha string) (uint, error) {
 	db := DB
 
-	// declaramos o map result
+	// result map
 	result := map[string]any{}
 
-	// fazemos a query, puxando senha e id
+	// we make a query, getting the password and id
 	db.Model(database).Select("senha, id").Where("usuario = ?", usuario).Find(&result)
 	// Em SQL: SELECT senha, id FROM users WHERE usuario=usuario
 
-	// transformamos a senha encriptada em string
-	senhaEncriptada := fmt.Sprintf("%v", result["senha"])
+	// we pass the hashedPass to strign
+	hashedPassword := fmt.Sprintf("%v", result["senha"])
 
-	// transformamos o id em int
+	// we pass the id to int
 	id, _ := strconv.ParseUint(fmt.Sprintf("%v", result["id"]), 10, 64)
 
-	// verificamos a veracidade da senha
-	err := argonpass.Verify(senha, senhaEncriptada)
+	// we verify if the password is correct
+	err := argonpass.Verify(senha, hashedPassword)
 
 	if err != nil {
 		return 0, err

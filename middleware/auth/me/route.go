@@ -8,8 +8,8 @@ import (
 func Routes(router fiber.Router) {
 	group := router.Group("/@me")
 
-	// Rota de login
 	group.Post("/status", Status)
+	group.Post("/login", Login)
 
 }
 

@@ -7,14 +7,13 @@ import (
 
 var FiberApp = fiber.New(fiber.Config{
 
-	// estamos usando um encoder de JSON customizado para melhor desempenho
-	// para mais informações, ler: docs.gofiber.io/guide/faster-fiber
+	// we are using a diferent json encoder to boost performace; read: docs.gofiber.io/guide/faster-fiber
 
 	JSONEncoder:   json.Marshal,
 	JSONDecoder:   json.Unmarshal,
-	Prefork:       true, // roda o servidor em várias instâncias; leia: docs.gofiber.io/api/fiber
-	StrictRouting: true, // basicamente /login/ é diferente de /login; leia: docs.gofiber.io/api/fiber
-	ServerHeader:  "BR-01",
-	AppName:       "JUJU Backend",
+	Prefork:       true, // read: docs.gofiber.io/api/fiber
+	StrictRouting: true, // /login != /login/; read: docs.gofiber.io/api/fiber
+	ServerHeader:  "REGION-01",
+	AppName:       "Floppa.Host",
 })
 

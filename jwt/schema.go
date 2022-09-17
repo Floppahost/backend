@@ -8,13 +8,15 @@ import (
 
 var Secret = []byte(os.Getenv("JWT_SECRET"))
 
+// base user Struct; may change later
 type User struct {
 	Usuario string `json:"usuario"`
 	ID      uint   `json:"ID"`
 	jwt.RegisteredClaims
 }
 
-type TrocarSenha struct {
+// change password token
+type ChangePassword struct {
 	ID string `json:"ID"`
 	jwt.RegisteredClaims
 }

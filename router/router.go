@@ -10,7 +10,6 @@ import (
 func ConnectRouter(app *fiber.App) {
 	authRoute := app.Group("/auth", logger.New(logger.Config{}))
 
-	// auth_Clientes.Routes(auth)
 	auth.Routes(authRoute)
 }
 
