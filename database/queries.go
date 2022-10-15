@@ -1,10 +1,12 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
 	argonpass "github.com/dwin/goArgonPass"
+	"github.com/floppahost/backend/model"
 )
 
 func Login(database any, usuario string, senha string) (uint, error) {
@@ -32,3 +34,22 @@ func Login(database any, usuario string, senha string) (uint, error) {
 
 	return uint(id), nil
 }
+
+func GetProfile(user string) (string, error) {
+	db := DB
+
+	// result map
+	result := map[string]any{}
+
+	// we make a query, getting the password and id
+	db.Model(model.Users{}).Where("user = ?", string(user)).First(&result)
+	fmt.Println(result)
+	id := result["id"]
+
+	if (id == nil) {
+		return "", errors.New("this user doesn't exist")
+	}
+
+	return fmt.Sprintf("%v",id), nil
+}
+

@@ -14,7 +14,7 @@ func GenerateUserToken(Autor string, Username string, ID uint) (string, error) {
 
 
 	claim := &User{
-		Usuario: Username,
+		User: Username,
 		ID:      ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiration),

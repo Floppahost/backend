@@ -2,9 +2,9 @@ package model
 
 import "gorm.io/gorm"
 
-type BaseUser struct {
-	Usuario string `gorm:"index:idx_user,unique"`
-	Senha   string
+type Users struct {
+	User string `gorm:"index:idx_user,unique"`
+	Password   string
 	gorm.Model
 }
 

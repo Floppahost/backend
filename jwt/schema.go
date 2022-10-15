@@ -10,7 +10,7 @@ var Secret = []byte(os.Getenv("JWT_SECRET"))
 
 // base user Struct; may change later
 type User struct {
-	Usuario string `json:"usuario"`
+	User string `json:"usuario"`
 	ID      uint   `json:"ID"`
 	jwt.RegisteredClaims
 }
