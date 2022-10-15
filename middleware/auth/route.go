@@ -6,7 +6,7 @@ import (
 )
 
 func Routes(router fiber.Router) {
-	group := router.Group("/@me")
+	group := router.Group("/")
 
 	group.Post("/status", Status)
 	group.Post("/login", Login)
