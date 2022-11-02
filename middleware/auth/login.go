@@ -21,7 +21,7 @@ func Login(c *fiber.Ctx) error {
 	id, err := database.Login(model.Users{}, parser.User, parser.Password)
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": true, "message": "Invalid data.", "data": nil})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "Invalid data", "data": nil})
 	}
 
 	token, err := jwt.GenerateUserToken("system", parser.User, id)

@@ -3,7 +3,6 @@ package files
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/floppahost/backend/buck"
@@ -18,7 +17,7 @@ func Upload(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("./%s", os.Getenv("FILE_PATH"))
+	path := fmt.Sprintf("%s%s", os.Getenv("FILE_PATH"), file.Filename)
 	c.SaveFile(file, fmt.Sprintf("./%s", path))
 	bucketName := os.Getenv("MINION_BUCKET_NAME")
 	fileName := file.Filename
@@ -28,8 +27,8 @@ func Upload(c *fiber.Ctx) error {
 
 	info, err := Bucket.FPutObject(ctx, bucketName, fileName, path, minio.PutObjectOptions{ContentType: fileHeader})
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
-
+	os.Remove(path)
 	return c.SendString(info.Bucket)
 }
