@@ -101,3 +101,9 @@ Authorization: JWT
 
 file: formFile
 ```
+- ✅ Status: **200**
+
+- ❌ Status:  **400, 401**
+
+    - **401** when missing something
+    - **404** when the user is unauthorized
