@@ -2,7 +2,7 @@
 ## `[POST] /api/login`
 ### Body
 
-```json
+```javascript
 {
 username: string
 password: string
@@ -12,7 +12,7 @@ password: string
 ### Response
 - ✅ Status: **200** 
 
-```json
+```javascript
 auth: true,
 error: false,
 message: "Logged In",
@@ -24,7 +24,7 @@ token: JWT
 
 - ❌ Status: **401**
 
-```json
+```javascript
 auth: false,
 error: false,
 message: "Invalid data",
@@ -33,7 +33,7 @@ message: "Invalid data",
 ## `[POST] /api/status`
 ### Body
 
-```json
+```javascript
 headers: {
     Authorization: JWT
 }
@@ -42,7 +42,7 @@ headers: {
 ### Response
 - ✅ Status: **202**
 
-```json
+```javascript
 auth: true,
 error: false,
 message: "Authenticated"
@@ -50,7 +50,7 @@ message: "Authenticated"
 
 - ❌ Status: **403**
 
-```json
+```javascript
 auth: false,
 error: false,
 message: "Not authorized"
@@ -60,7 +60,7 @@ message: "Not authorized"
 
 ### Body
 
-```json
+```javascript
 headers: {
 Authorization: JWT
 },
@@ -71,7 +71,7 @@ username: string
 ### Response
 - ✅ Status: **200**
 
-```json
+```javascript
 auth: true,
 error: false,
 message: "User fetched",
@@ -94,7 +94,7 @@ uploads: string // upload counter—the user can toggle this in settings
 
 ### Body
 
-```json
+```javascript
 headers: {
 Authorization: JWT
 },
