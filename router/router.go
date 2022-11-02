@@ -1,8 +1,8 @@
 package router
 
 import (
-	root "github.com/floppahost/backend/middleware"
 	auth "github.com/floppahost/backend/middleware/auth"
+	files "github.com/floppahost/backend/middleware/files"
 	profile "github.com/floppahost/backend/middleware/profile"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,5 +16,5 @@ func ConnectRouter(app *fiber.App) {
 
 	profile.Routes(profileRoute)
 	auth.Routes(authRoute)
-	root.Routes(rootRoute)
+	files.Routes(rootRoute)
 }
