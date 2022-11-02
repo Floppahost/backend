@@ -1,4 +1,4 @@
-package bucket
+package buck
 
 import (
 	"log"
@@ -11,7 +11,7 @@ import (
 
 var Bucket *minio.Client
 
-func Main() {
+func Start() {
 	endpoint := os.Getenv("MINIO_ENDPOINT")
 	accessKeyID := os.Getenv("MINION_ACCESS_KEY_ID")
 	secretAccessKey := os.Getenv("MINION_SECRET_ACCESS_KEY")

@@ -1,9 +1,9 @@
 package router
 
 import (
-	auth "github.com/floppahost/backend/middleware/auth"
-	files "github.com/floppahost/backend/middleware/files"
-	profile "github.com/floppahost/backend/middleware/profile"
+	"github.com/floppahost/backend/middleware/auth"
+	"github.com/floppahost/backend/middleware/files"
+	"github.com/floppahost/backend/middleware/profile"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"

@@ -6,6 +6,8 @@ import (
 	"github.com/joho/godotenv"
 
 	// locais
+
+	"github.com/floppahost/backend/buck"
 	"github.com/floppahost/backend/configs"
 	"github.com/floppahost/backend/database"
 	"github.com/floppahost/backend/router"
@@ -24,12 +26,12 @@ func main() {
 	// conectamos à database
 	database.Connect()
 
+	// we start our bucket
+	buck.Start()
 	// configuramos as rotas
 	router.ConnectRouter(app)
 
 	// conectamos o app à porta 3000
 	app.Listen(":4000")
 
-
 }
-
