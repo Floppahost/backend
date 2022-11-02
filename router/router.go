@@ -10,11 +10,11 @@ import (
 )
 
 func ConnectRouter(app *fiber.App) {
-	rootRoute := app.Group("/", logger.New(logger.Config{}))
+	filesRoute := app.Group("/files", logger.New(logger.Config{}))
 	authRoute := app.Group("/auth", logger.New(logger.Config{}))
 	profileRoute := app.Group("/profile", logger.New(logger.Config{}))
 
 	profile.Routes(profileRoute)
 	auth.Routes(authRoute)
-	files.Routes(rootRoute)
+	files.Routes(filesRoute)
 }

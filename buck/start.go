@@ -27,5 +27,4 @@ func Start() {
 		log.Fatalln(err)
 	}
 
-	log.Printf("%#v\n", Bucket)
 }
