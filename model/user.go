@@ -3,8 +3,9 @@ package model
 import "gorm.io/gorm"
 
 type Users struct {
-	User string `gorm:"index:idx_user,unique"`
-	Password   string
 	gorm.Model
+	User     string `gorm:"unique,not null"`
+	Email    string `gorm:"unique,not null"`
+	Password string `gorm:"unique,not null"`
+	Token    string `gorm:"unique,not null"`
 }
-

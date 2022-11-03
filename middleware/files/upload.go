@@ -30,5 +30,6 @@ func Upload(c *fiber.Ctx) error {
 		return err
 	}
 	os.Remove(path)
+
 	return c.SendString(info.Bucket)
 }

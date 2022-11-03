@@ -10,6 +10,6 @@ func Routes(router fiber.Router) {
 
 	group.Post("/status", Status)
 	group.Post("/login", Login)
+	group.Post("/register", Register)
 
 }
-
