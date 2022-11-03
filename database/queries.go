@@ -110,7 +110,7 @@ func InviteWave(jwt string) error {
 	db := DB
 
 	if !IsAdmin(jwt) {
-		return errors.New("unauthorized")
+		return errors.New("you don't have permission to perform this action")
 	}
 
 	var result any
@@ -125,21 +125,19 @@ func InviteWave(jwt string) error {
 func GenerateInvite(jwt string, username string) error {
 	db := DB
 
-	isInviteEnabled, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY"))
-	if !isInviteEnabled {
-		return errors.New("invite system is disabled")
-	}
-
 	if !IsAdmin(jwt) {
-		return errors.New("unauthorized")
+		return errors.New("you don't have permission to perform this action")
 	}
 
 	result := map[string]any{}
 	db.Model(&model.Users{}).Select("id").Where("username = ?", username).Find(&result)
+	if len(result) == 0 {
+		return errors.New("the requested user doesn't exist")
+	}
 
 	id, err := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
 	if err != nil {
-		return err
+		return errors.New("something weird happened")
 	}
 
 	invite := model.Invites{UserID: int(id)}

@@ -141,3 +141,23 @@ _If the invite system is disabled, we just ignore the invite_
 - ✅ Status: **200**
 
 - ❌ Status:  **400**
+
+## `[POST] /admin/invite/user`
+
+### Request
+
+```javascript
+headers: {
+Authorization: JWT
+},
+
+username: string
+
+```
+- ✅ Status: **200**
+
+- ❌ Status:  **401, 501**
+
+    - **501** when invite system is disabled
+    - **401** when the user is unauthorized
+    - **404** when the user doesn't exist

@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -20,7 +21,23 @@ func GenerateInvite(c *fiber.Ctx) error {
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
+
 	headers := c.GetReqHeaders()
-	database.GenerateInvite(headers["Authorization"], parser.Username)
-	return c.SendString("a")
+	err := database.GenerateInvite(headers["Authorization"], parser.Username)
+
+	if err != nil {
+		errString := fmt.Sprintf("%v", err)
+		errCode := func() int {
+			switch errString {
+			case "you don't have permission to perform this action":
+				return 401
+			case "the requested user doesn't exist":
+				return 404
+			}
+			return 500
+		}
+		return c.Status(errCode()).JSON(fiber.Map{"error": false, "message": errString})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success"})
 }
