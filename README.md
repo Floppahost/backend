@@ -119,7 +119,7 @@ Authorization: JWT
 
 - ❌ Status:  **401, 501**
 
-    - **501** when invite system is disabled
+    - **501** when the invite system is disabled
     - **401** when the user is unauthorized
 
 
@@ -158,6 +158,6 @@ username: string
 
 - ❌ Status:  **401, 501**
 
-    - **501** when invite system is disabled
+    - **501** when the invite system is disabled
     - **401** when the user is unauthorized
     - **404** when the user doesn't exist
