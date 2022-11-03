@@ -1,5 +1,5 @@
 # 🚧 API Routes
-## `[POST] /api/login`
+## `[POST] /login`
 ### Request
 
 ```javascript
@@ -30,7 +30,7 @@ error: false,
 message: "Invalid data",
 ```
 
-## `[POST] /api/status`
+## `[POST] /status`
 ### Request
 
 ```javascript
@@ -56,7 +56,7 @@ error: false,
 message: "Not authorized"
 ```
 
-## `[GET] /api/profile/get/<username>` — not ready yet
+## `[GET] /profile/get/<username>` — not ready yet
 
 ### Request
 
@@ -88,7 +88,7 @@ uploads: string // upload counter—the user can toggle this in settings
     - **401** when not authorized
     - **404** when the user doesn't exist
 
-## `[POST] /api/files/upload`
+## `[POST] /files/upload`
 
 ### Request
 
@@ -106,7 +106,7 @@ file: formFile
     - **401** when not authorized
     - **404** when the user doesn't exist
 
-## `[POST] /api/admin/wave`
+## `[POST] /admin/wave`
 
 ### Request
 
@@ -123,7 +123,7 @@ Authorization: JWT
     - **401** when the user is unauthorized
 
 
-## `[POST] /api/auth/register`
+## `[POST] /auth/register`
 
 ### Request
 
