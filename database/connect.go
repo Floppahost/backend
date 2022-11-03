@@ -32,7 +32,6 @@ func Connect() {
 	fmt.Println("Connected to the DB")
 
 	// migramos o esquema
-	DB.AutoMigrate(&model.Users{})
+	DB.AutoMigrate(&model.Users{}, &model.Invites{})
 
 }
-

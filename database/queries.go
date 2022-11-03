@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	argonpass "github.com/dwin/goArgonPass"
-	"github.com/floppahost/backend/lib"
 	"github.com/floppahost/backend/model"
+	"github.com/google/uuid"
 )
 
 func Login(database any, usuario string, senha string) (uint, error) {
@@ -42,7 +42,9 @@ func Register(username string, password string, email string, inviteCode string)
 
 	result := map[string]interface{}{}
 
-	if invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY")); invite {
+	invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY"))
+
+	if invite {
 		db.Model(&model.Invites{}).Where("code = ?", inviteCode).Find(&result)
 
 		// verify if the invite is valid
@@ -58,7 +60,7 @@ func Register(username string, password string, email string, inviteCode string)
 	}
 
 	// declare our user model and do the create operation
-	user := model.Users{User: username, Email: email, Password: hashedPassword, Token: lib.Token()}
+	user := model.Users{User: username, Email: email, Password: hashedPassword, ApiKey: uuid.NewString()}
 	create := db.Create(&user)
 
 	// verify if we created the user
@@ -67,7 +69,10 @@ func Register(username string, password string, email string, inviteCode string)
 	}
 
 	// update the invite row
-	db.Model(model.Invites{}).Where("code = ?", inviteCode).Updates(model.Invites{UsedBy: username, UsedByID: int(user.ID)})
+	if invite {
+		db.Model(model.Invites{}).Where("code = ?", inviteCode).Updates(model.Invites{UsedBy: username, UsedByID: int(user.ID)})
+
+	}
 
 	return nil
 }
@@ -88,4 +93,20 @@ func GetProfile(user string) (string, error) {
 	}
 
 	return fmt.Sprintf("%v", id), nil
+}
+
+func InviteWave(jwt string) error {
+	db := DB
+
+	// result := map[string]any{}
+	// db.Model(model.Users{}).Where("token = ? AND admin = ?", jwt, true).Find(&result)
+
+	// if result == nil {
+	// 	return errors.New("you don't have permission to perform that")
+	// }
+
+	var result any
+	db.Raw("INSERT INTO invites (user_id) (SELECT id FROM users)").Scan(&result)
+	fmt.Println(result)
+	return nil
 }

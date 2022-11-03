@@ -1,11 +1,14 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Invites struct {
 	gorm.Model
-	UserID   int    `gorm:"primarykey"`
-	Code     string `gorm:"unique"`
+	UserID   int       `gorm:"primarykey"`
+	Code     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()"`
 	UsedBy   string
 	UsedByID int
 }

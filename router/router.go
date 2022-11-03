@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/floppahost/backend/middleware/admin"
 	"github.com/floppahost/backend/middleware/auth"
 	"github.com/floppahost/backend/middleware/files"
 	"github.com/floppahost/backend/middleware/profile"
@@ -13,8 +14,11 @@ func ConnectRouter(app *fiber.App) {
 	filesRoute := app.Group("/files", logger.New(logger.Config{}))
 	authRoute := app.Group("/auth", logger.New(logger.Config{}))
 	profileRoute := app.Group("/profile", logger.New(logger.Config{}))
+	adminRoute := app.Group("/admin", logger.New(logger.Config{}))
 
 	profile.Routes(profileRoute)
 	auth.Routes(authRoute)
 	files.Routes(filesRoute)
+	files.Routes(filesRoute)
+	admin.Routes(adminRoute)
 }

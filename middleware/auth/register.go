@@ -1,15 +1,17 @@
 package auth
 
 import (
+	"fmt"
+
 	"github.com/floppahost/backend/database"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Request struct {
-	email    string
-	password string
-	invite   string
-	username string
+	Email    string `json:"email" xml:"email"`
+	Password string `json:"password" xml:"password"`
+	Invite   string `json:"invite" xml:"invite"`
+	Username string `json:"username" xml:"username"`
 }
 
 func Register(c *fiber.Ctx) error {
@@ -20,7 +22,12 @@ func Register(c *fiber.Ctx) error {
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
+	fmt.Println(parser.Password)
+	err := database.Register(parser.Username, parser.Password, parser.Email, parser.Invite)
 
-	database.Register(parser.username, parser.password, parser.email, parser.invite)
-	return c.SendString("a")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": fmt.Sprintf("%s", err)})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "User registered"})
 }
