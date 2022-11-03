@@ -107,6 +107,9 @@ func InviteWave(jwt string) error {
 
 	var result any
 	db.Raw("INSERT INTO invites (user_id) (SELECT id FROM users)").Scan(&result)
-	fmt.Println(result)
+
+	if result != nil {
+		return errors.New("something unexpected happened")
+	}
 	return nil
 }
