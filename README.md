@@ -56,7 +56,7 @@ error: false,
 message: "Not authorized"
 ```
 
-## `[GET] /api/profile/get` — not ready yet
+## `[GET] /api/profile/get/<username>` — not ready yet
 
 ### Request
 
@@ -64,8 +64,6 @@ message: "Not authorized"
 headers: {
 Authorization: JWT
 },
-
-username: string
 ```
 
 ### Response
