@@ -7,34 +7,32 @@ import (
 	"strconv"
 
 	argonpass "github.com/dwin/goArgonPass"
+	"github.com/floppahost/backend/jwt"
 	"github.com/floppahost/backend/model"
 	"github.com/google/uuid"
 )
 
-func Login(database any, usuario string, senha string) (uint, error) {
+func Login(database any, usuario string, senha string) (string, error) {
 	db := DB
 
 	// result map
 	result := map[string]any{}
 
 	// we make a query, getting the password and id
-	db.Model(database).Select("senha, id").Where("usuario = ?", usuario).Find(&result)
+	db.Model(database).Select("password, id, token").Where("username = ?", usuario).Find(&result)
 	// Em SQL: SELECT senha, id FROM users WHERE usuario=usuario
 
-	// we pass the hashedPass to strign
+	// we pass the hashedPass to string
 	hashedPassword := fmt.Sprintf("%v", result["senha"])
-
-	// we pass the id to int
-	id, _ := strconv.ParseUint(fmt.Sprintf("%v", result["id"]), 10, 64)
 
 	// we verify if the password is correct
 	err := argonpass.Verify(senha, hashedPassword)
 
 	if err != nil {
-		return 0, err
+		return "", errors.New("invalid credentials")
 	}
 
-	return uint(id), nil
+	return fmt.Sprintf("%s", result["token"]), nil
 }
 
 func Register(username string, password string, email string, inviteCode string) error {
@@ -45,10 +43,9 @@ func Register(username string, password string, email string, inviteCode string)
 	invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY"))
 
 	if invite {
-		db.Model(&model.Invites{}).Where("code = ?", inviteCode).Find(&result)
-
+		db.Model(&model.Invites{}).Where("code = ? AND used_by IS NULL AND used_by_id IS NULL", inviteCode).Find(&result)
 		// verify if the invite is valid
-		if result == nil {
+		if len(result) == 0 {
 			return errors.New("invalid invite")
 		}
 	}
@@ -60,7 +57,15 @@ func Register(username string, password string, email string, inviteCode string)
 	}
 
 	// declare our user model and do the create operation
-	user := model.Users{User: username, Email: email, Password: hashedPassword, ApiKey: uuid.NewString()}
+
+	user := model.Users{}
+	token, err := jwt.GenerateUserToken("system", username)
+
+	if err != nil {
+		return err
+	}
+	user = model.Users{Username: username, Email: email, Password: hashedPassword, ApiKey: uuid.NewString(), Token: token}
+
 	create := db.Create(&user)
 
 	// verify if we created the user
@@ -70,8 +75,7 @@ func Register(username string, password string, email string, inviteCode string)
 
 	// update the invite row
 	if invite {
-		db.Model(model.Invites{}).Where("code = ?", inviteCode).Updates(model.Invites{UsedBy: username, UsedByID: int(user.ID)})
-
+		db.Model(&model.Invites{}).Where("code = ?", inviteCode).Updates(model.Invites{UsedBy: username, UsedByID: int(user.ID)})
 	}
 
 	return nil
@@ -85,7 +89,6 @@ func GetProfile(user string) (string, error) {
 
 	// we make a query, getting the password and id
 	db.Model(model.Users{}).Where("user = ?", string(user)).First(&result)
-	fmt.Println(result)
 	id := result["id"]
 
 	if id == nil {

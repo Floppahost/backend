@@ -6,22 +6,20 @@ import (
 	jwt "github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateUserToken(Autor string, Username string, ID uint) (string, error) {
+func GenerateUserToken(Autor string, Username string) (string, error) {
 	var token string
 
 	// todo: change expiration
 	expiration := time.Now().Add(5 * time.Minute)
 
-
 	claim := &User{
 		User: Username,
-		ID:      ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiration),
 			Subject:   Autor,
 		},
 	}
-	
+
 	// the token itself
 	token_bruto := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
@@ -33,4 +31,3 @@ func GenerateUserToken(Autor string, Username string, ID uint) (string, error) {
 	}
 	return token, nil
 }
-

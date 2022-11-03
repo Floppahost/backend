@@ -12,7 +12,7 @@ func Validar(tokens string) (jwt.MapClaims, error) {
 		if _, err := token.Method.(*jwt.SigningMethodHMAC); !err {
 			return nil, errors.New("invalid algorithm")
 		}
-		return Secret, nil
+		return nil, nil
 	})
 
 	// verificamos se houve erro na validação do algorítimo
@@ -27,4 +27,3 @@ func Validar(tokens string) (jwt.MapClaims, error) {
 
 	return nil, err
 }
-

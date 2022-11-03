@@ -22,7 +22,6 @@ func Register(c *fiber.Ctx) error {
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-	fmt.Println(parser.Password)
 	err := database.Register(parser.Username, parser.Password, parser.Email, parser.Invite)
 
 	if err != nil {

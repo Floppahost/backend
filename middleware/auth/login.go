@@ -2,11 +2,12 @@ package auth
 
 import (
 	// externos
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 
 	// locais
 	"github.com/floppahost/backend/database"
-	"github.com/floppahost/backend/jwt"
 	"github.com/floppahost/backend/model"
 )
 
@@ -18,17 +19,13 @@ func Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-	id, err := database.Login(model.Users{}, parser.User, parser.Password)
+	token, err := database.Login(model.Users{}, parser.Username, parser.Password)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "Invalid data", "data": nil})
 	}
 
-	token, err := jwt.GenerateUserToken("system", parser.User, id)
-	if err != nil {
-		panic(err)
-	}
-
+	fmt.Println(token)
 	cookie := new(fiber.Cookie)
 	cookie.Name = "token"
 	cookie.Value = token
