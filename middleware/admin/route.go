@@ -8,4 +8,5 @@ func Routes(router fiber.Router) {
 	group := router.Group("/")
 
 	group.Post("/wave", InviteWave)
+	group.Post("/invite/user", GenerateInvite)
 }

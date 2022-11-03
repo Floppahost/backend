@@ -10,5 +10,5 @@ type Users struct {
 	ApiKey    string `gorm:"not null;unique"`
 	Token     string `gorm:"not null;unique"`
 	InviteBan bool   `gorm:"default:null"`
-	Admin     bool
+	Admin     bool   `gorm:"not null;default:false"`
 }

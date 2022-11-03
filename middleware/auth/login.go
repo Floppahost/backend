@@ -8,18 +8,21 @@ import (
 
 	// locais
 	"github.com/floppahost/backend/database"
-	"github.com/floppahost/backend/model"
 )
+
+type Req struct {
+	Username string `json:"username" xml:"username"`
+	Password string `json:"password" xml:"password"`
+}
 
 func Login(c *fiber.Ctx) error {
 	// declaramos o tipo do parser
-	parser := new(model.Users)
-
+	parser := new(Req)
 	// verificamos se há erros no BodyParser
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-	token, err := database.Login(model.Users{}, parser.Username, parser.Password)
+	token, err := database.Login(parser.Username, parser.Password)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "Invalid data", "data": nil})

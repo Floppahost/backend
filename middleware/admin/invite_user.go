@@ -8,15 +8,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func InviteWave(c *fiber.Ctx) error {
+type Req struct {
+	Username string `json:"username" xml:"username"`
+}
 
+func GenerateInvite(c *fiber.Ctx) error {
+	parser := new(Req)
 	if invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY")); !invite {
 		return c.Status(fiber.StatusNotImplemented).JSON(fiber.Map{"error": true, "message": "Invite system isn't enabled"})
 	}
-	err := database.InviteWave("")
-	if err != nil {
+	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success"})
+	headers := c.GetReqHeaders()
+	database.GenerateInvite(headers["Authorization"], parser.Username)
+	return c.SendString("a")
 }
