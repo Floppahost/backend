@@ -1,6 +1,6 @@
 # 🚧 API Routes
 ## `[POST] /api/login`
-### Body
+### Request
 
 ```javascript
 {
@@ -31,7 +31,7 @@ message: "Invalid data",
 ```
 
 ## `[POST] /api/status`
-### Body
+### Request
 
 ```javascript
 headers: {
@@ -58,7 +58,7 @@ message: "Not authorized"
 
 ## `[GET] /api/profile/get` — not ready yet
 
-### Body
+### Request
 
 ```javascript
 headers: {
@@ -92,7 +92,7 @@ uploads: string // upload counter—the user can toggle this in settings
 
 ## `[POST] /api/files/upload`
 
-### Body
+### Request
 
 ```javascript
 headers: {
@@ -103,7 +103,43 @@ file: formFile
 ```
 - ✅ Status: **200**
 
-- ❌ Status:  **400, 401**
+- ❌ Status:  **401, 404**
 
-    - **401** when missing something
-    - **404** when the user is unauthorized
+    - **401** when not authorized
+    - **404** when the user doesn't exist
+
+## `[POST] /api/admin/wave`
+
+### Request
+
+```javascript
+headers: {
+Authorization: JWT
+},
+```
+- ✅ Status: **200**
+
+- ❌ Status:  **401, 501**
+
+    - **501** when invite system is disabled
+    - **401** when the user is unauthorized
+
+
+## `[POST] /api/auth/register`
+
+### Request
+
+```javascript
+body: {
+    username: string,
+    email: string,
+    password: string,
+    invite: string
+}
+```
+
+_If the invite system is disabled, we just ignore the invite_
+
+- ✅ Status: **200**
+
+- ❌ Status:  **400**
