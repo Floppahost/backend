@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 
 	argonpass "github.com/dwin/goArgonPass"
@@ -40,11 +41,14 @@ func Register(username string, password string, email string, inviteCode string)
 	db := DB
 
 	result := map[string]interface{}{}
-	db.Model(&model.Invites{}).Where("code = ?", inviteCode).Find(&result)
 
-	// verify if the invite is valid
-	if result == nil {
-		return errors.New("invalid invite")
+	if invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY")); invite {
+		db.Model(&model.Invites{}).Where("code = ?", inviteCode).Find(&result)
+
+		// verify if the invite is valid
+		if result == nil {
+			return errors.New("invalid invite")
+		}
 	}
 
 	// hash the password and verify the status
