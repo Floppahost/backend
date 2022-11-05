@@ -1,29 +1,23 @@
 package admin
 
 import (
-	"os"
-	"strconv"
-
 	"github.com/floppahost/backend/database"
 	"github.com/floppahost/backend/handler"
 	"github.com/gofiber/fiber/v2"
 )
 
-type req struct {
+type Req struct {
 	Username string `json:"username" xml:"username"`
+	Reason string `json:"reason" xml:"reason"`
 }
 
-func GenerateInvite(c *fiber.Ctx) error {
-	parser := new(req)
-	if invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY")); !invite {
-		return c.Status(fiber.StatusNotImplemented).JSON(fiber.Map{"error": true, "message": "Invite system isn't enabled"})
-	}
+func BlacklistUser(c *fiber.Ctx) error {
+	headers := c.GetReqHeaders()
+	parser := new(Req)
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-
-	headers := c.GetReqHeaders()
-	err := database.GenerateInvite(headers["Authorization"], parser.Username)
+	err := database.BlacklistUser(headers["Authorization"],parser.Username, parser.Reason)
 
 	if err != nil {
 		status, errString := handler.Errors(err)

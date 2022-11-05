@@ -8,6 +8,7 @@ import (
 
 	// locais
 	"github.com/floppahost/backend/database"
+	"github.com/floppahost/backend/handler"
 )
 
 type Req struct {
@@ -25,7 +26,8 @@ func Login(c *fiber.Ctx) error {
 	token, err := database.Login(parser.Username, parser.Password)
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "Invalid data", "data": nil})
+		status, errString := handler.Errors(err)
+		return c.Status(status).JSON(fiber.Map{"error": true, "message": errString})
 	}
 
 	fmt.Println(token)
@@ -34,6 +36,6 @@ func Login(c *fiber.Ctx) error {
 	cookie.Value = token
 
 	c.Cookie(cookie)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Logged in.", "data": nil})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Logged in."})
 
 }

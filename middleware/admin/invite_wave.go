@@ -1,11 +1,11 @@
 package admin
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/floppahost/backend/database"
+	"github.com/floppahost/backend/handler"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,15 +17,8 @@ func InviteWave(c *fiber.Ctx) error {
 	err := database.InviteWave(headers["Authorization"])
 
 	if err != nil {
-		errString := fmt.Sprintf("%v", err)
-		errCode := func() int {
-			switch errString {
-			case "you don't have permission to perform this action":
-				return 401
-			}
-			return 500
-		}
-		return c.Status(errCode()).JSON(fiber.Map{"error": false, "message": errString})
+		status, errString := handler.Errors(err)
+		return c.Status(status).JSON(fiber.Map{"error": true, "message": errString})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success"})
 }

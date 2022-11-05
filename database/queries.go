@@ -12,12 +12,16 @@ import (
 	"github.com/google/uuid"
 )
 
-func IsAdmin(jwt string) bool {
+func VerifyUser(jwt string) model.UserValidation {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Users{}).Select("admin").Where("token = ?", jwt).Find(&result)
-	e, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
-	return e
+	db.Model(&model.Users{}).Select("blacklist, admin").Where("token = ?", jwt).Find(&result)
+	if result == nil {
+		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false}
+	}
+	admin, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
+	blacklisted := result["blacklist"] != nil
+	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true}
 }
 
 func Login(username string, password string) (string, error) {
@@ -27,7 +31,8 @@ func Login(username string, password string) (string, error) {
 	result := map[string]any{}
 
 	// we make a query, getting the password and id
-	db.Model(&model.Users{}).Select("password, id, token").Where("username = ?", username).Find(&result)
+	db.Model(&model.Users{}).Select("password, id, token, blacklist").Where("username = ?", username).Find(&result)
+
 	// Em SQL: SELECT senha, id FROM users WHERE usuario=usuario
 	// we pass the hashedPass to string
 	hashedPassword := fmt.Sprintf("%v", result["password"])
@@ -39,14 +44,17 @@ func Login(username string, password string) (string, error) {
 	if err != nil {
 		return "", errors.New("invalid credentials")
 	}
-
+	fmt.Println(result)
+	if result["blacklist"] != nil {
+		return "", errors.New("the user is currently blacklisted")
+	}
 	return fmt.Sprintf("%s", result["token"]), nil
 }
 
 func Register(username string, password string, email string, inviteCode string) error {
 	db := DB
 
-	result := map[string]string{}
+	result := map[string]any{}
 
 	invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY"))
 
@@ -109,7 +117,9 @@ func GetProfile(user string) (string, error) {
 func InviteWave(jwt string) error {
 	db := DB
 
-	if !IsAdmin(jwt) {
+	userClaims := VerifyUser(jwt)
+
+	if !userClaims.ValidUser || !userClaims.Admin || userClaims.Blacklisted {
 		return errors.New("you don't have permission to perform this action")
 	}
 
@@ -125,10 +135,12 @@ func InviteWave(jwt string) error {
 func GenerateInvite(jwt string, username string) error {
 	db := DB
 
-	if !IsAdmin(jwt) {
+	userClaims := VerifyUser(jwt)
+	if !userClaims.ValidUser || !userClaims.Admin || userClaims.Blacklisted {
 		return errors.New("you don't have permission to perform this action")
 	}
 
+	VerifyUser(jwt)
 	result := map[string]any{}
 	db.Model(&model.Users{}).Select("id").Where("username = ?", username).Find(&result)
 	if len(result) == 0 {
@@ -147,5 +159,41 @@ func GenerateInvite(jwt string, username string) error {
 		return errors.New("something weird happened")
 	}
 
+	return nil
+}
+
+func BlacklistUser(jwt string, username string, reason string) error {
+	db := DB
+
+	userClaims := VerifyUser(jwt)
+
+	if !userClaims.ValidUser || !userClaims.Admin || userClaims.Blacklisted {
+		return errors.New("you don't have permission to perform this action")
+	}
+
+	query := db.Model(&model.Users{}).Where("username = ?", username).Updates(model.Users{Blacklist: reason})
+	
+	if query.Error != nil {
+		return errors.New("something weird happened")
+	}
+	
+	return nil
+}
+
+func UnblacklistUser(jwt string, username string, reason string) error {
+	db := DB
+
+	userClaims := VerifyUser(jwt)
+
+	if !userClaims.ValidUser || !userClaims.Admin || userClaims.Blacklisted {
+		return errors.New("you don't have permission to perform this action")
+	}
+
+	query := db.Model(&model.Users{}).Where("username = ?", username).Updates(model.Users{Blacklist: ""})
+	
+	if query.Error != nil {
+		return errors.New("something weird happened")
+	}
+	
 	return nil
 }

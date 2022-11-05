@@ -9,4 +9,5 @@ func Routes(router fiber.Router) {
 
 	group.Post("/wave", InviteWave)
 	group.Post("/invite/user", GenerateInvite)
+	group.Post("/blacklist", BlacklistUser)
 }
