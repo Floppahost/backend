@@ -174,7 +174,7 @@ func BlacklistUser(jwt string, username string, reason string) error {
 	query := db.Model(&model.Users{}).Where("username = ?", username).Updates(model.Users{Blacklist: reason})
 	
 	if query.Error != nil {
-		return errors.New("something weird happened")
+		return errors.New("the requested user doesn't exist")
 	}
 	
 	return nil
@@ -192,7 +192,7 @@ func UnblacklistUser(jwt string, username string, reason string) error {
 	query := db.Model(&model.Users{}).Where("username = ?", username).Updates(model.Users{Blacklist: ""})
 	
 	if query.Error != nil {
-		return errors.New("something weird happened")
+		return errors.New("the requested user doesn't exist")
 	}
 	
 	return nil

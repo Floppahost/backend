@@ -1,16 +1,19 @@
 # 🚧 API Routes
+
 ## `[POST] /login`
+
 ### Request
 
 ```javascript
 {
-username: string
-password: string
+  username: string;
+  password: string;
 }
 ```
 
 ### Response
-- ✅ Status: **200** 
+
+- ✅ Status: **200**
 
 ```javascript
 auth: true,
@@ -31,15 +34,17 @@ message: "Invalid data",
 ```
 
 ## `[POST] /status`
+
 ### Request
 
 ```javascript
 headers: {
-    Authorization: JWT
+  Authorization: JWT;
 }
 ```
 
 ### Response
+
 - ✅ Status: **202**
 
 ```javascript
@@ -67,6 +72,7 @@ Authorization: JWT
 ```
 
 ### Response
+
 - ✅ Status: **200**
 
 ```javascript
@@ -83,10 +89,10 @@ uploads: string // upload counter—the user can toggle this in settings
 }
 ```
 
-- ❌ Status:  **401, 404**
+- ❌ Status: **401, 404**
 
-    - **401** when not authorized
-    - **404** when the user doesn't exist
+  - **401** when not authorized
+  - **404** when the user doesn't exist
 
 ## `[POST] /files/upload`
 
@@ -99,12 +105,13 @@ Authorization: JWT
 
 file: formFile
 ```
+
 - ✅ Status: **200**
 
-- ❌ Status:  **401, 404**
+- ❌ Status: **401, 404**
 
-    - **401** when not authorized
-    - **404** when the user doesn't exist
+  - **401** when not authorized
+  - **404** when the user doesn't exist
 
 ## `[POST] /admin/wave`
 
@@ -115,13 +122,13 @@ headers: {
 Authorization: JWT
 },
 ```
+
 - ✅ Status: **200**
 
-- ❌ Status:  **401, 501**
+- ❌ Status: **401, 501**
 
-    - **501** when the invite system is disabled
-    - **401** when the user is unauthorized
-
+  - **501** when the invite system is disabled
+  - **401** when the user is unauthorized
 
 ## `[POST] /auth/register`
 
@@ -140,7 +147,7 @@ _If the invite system is disabled, we just ignore the invite_
 
 - ✅ Status: **200**
 
-- ❌ Status:  **400**
+- ❌ Status: **400**
 
 ## `[POST] /admin/invite/user`
 
@@ -154,10 +161,52 @@ Authorization: JWT
 username: string
 
 ```
+
 - ✅ Status: **200**
 
-- ❌ Status:  **401, 501**
+- ❌ Status: **401, 501**
 
-    - **501** when the invite system is disabled
-    - **401** when the user is unauthorized
-    - **404** when the user doesn't exist
+  - **501** when the invite system is disabled
+  - **401** when the user is unauthorized
+  - **404** when the user doesn't exist
+
+## `[POST] /admin/blacklist`
+
+### Request
+
+```javascript
+headers: {
+Authorization: JWT
+},
+
+username: string
+rason: string
+
+```
+
+- ✅ Status: **200**
+
+- ❌ Status: **401, 404**
+
+  - **401** when the user is unauthorized
+  - **404** when the user doesn't exist
+
+## `[POST] /admin/unblacklist`
+
+### Request
+
+```javascript
+headers: {
+Authorization: JWT
+},
+
+username: string
+
+```
+
+- ✅ Status: **200**
+
+- ❌ Status: **401, 404**
+
+  - **401** when the user is unauthorized
+  - **404** when the user doesn't exist
