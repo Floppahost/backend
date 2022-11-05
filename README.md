@@ -180,7 +180,7 @@ Authorization: JWT
 },
 
 username: string
-rason: string
+reason: string
 
 ```
 
