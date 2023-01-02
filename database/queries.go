@@ -15,13 +15,26 @@ import (
 func VerifyUser(jwt string) model.UserValidation {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Users{}).Select("blacklist, admin").Where("token = ?", jwt).Find(&result)
-	if result == nil {
-		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false}
+	db.Model(&model.Users{}).Select("blacklist, admin, username").Where("token = ?", jwt).Find(&result)
+	if len(result) == 0 {
+		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: ""}
 	}
 	admin, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
 	blacklisted := result["blacklist"] != nil
 	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true}
+}
+
+func VerifyUserApiKey(api string) model.UserValidation {
+	db := DB
+	result := map[string]any{}
+	db.Model(&model.Users{}).Select("blacklist, admin, username").Where("api_key = ?", api).Find(&result)
+	if len(result) == 0 {
+		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: ""}
+	}
+	admin, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
+	blacklisted := result["blacklist"] != nil
+	username := fmt.Sprintf("%s", result["username"])
+	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true, Username: username}
 }
 
 func Login(username string, password string) (string, error) {
