@@ -8,5 +8,6 @@ func Routes(router fiber.Router) {
 	group := router.Group("/")
 
 	group.Post("/upload", Upload)
+	group.Get("/render/:id", Render)
 
 }

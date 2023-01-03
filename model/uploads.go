@@ -4,10 +4,14 @@ import "gorm.io/gorm"
 
 type Uploads struct {
 	gorm.Model
+	UploadID 	string
+	Object 		string 
 	UserID      int `gorm:"primarykey"`
-	Embed       bool
+	Name 		string
 	Title       string
 	Description string
 	Author      string
 	Color       string
+	EmbedEnabled bool
+	FileName 	string
 }

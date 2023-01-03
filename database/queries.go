@@ -15,26 +15,29 @@ import (
 func VerifyUser(jwt string) model.UserValidation {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Users{}).Select("blacklist, admin, username").Where("token = ?", jwt).Find(&result)
+	db.Model(&model.Users{}).Select("blacklist, admin, username, id").Where("token = ?", jwt).Find(&result)
 	if len(result) == 0 {
-		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: ""}
+		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: "", Uid: -1}
 	}
 	admin, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
 	blacklisted := result["blacklist"] != nil
-	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true}
+	username := fmt.Sprintf("%s", result["username"])
+	uid, _ := strconv.ParseInt(fmt.Sprintf("%s", result["id"]), 64, 64)
+	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true, Username: username, Uid: int(uid)}
 }
 
 func VerifyUserApiKey(api string) model.UserValidation {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Users{}).Select("blacklist, admin, username").Where("api_key = ?", api).Find(&result)
+	db.Model(&model.Users{}).Select("blacklist, admin, username, id").Where("api_key = ?", api).Find(&result)
 	if len(result) == 0 {
-		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: ""}
+		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: "", Uid: -1}
 	}
 	admin, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
 	blacklisted := result["blacklist"] != nil
 	username := fmt.Sprintf("%s", result["username"])
-	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true, Username: username}
+	uid, _ := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
+	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true, Username: username, Uid: int(uid)}
 }
 
 func Login(username string, password string) (string, error) {
@@ -44,7 +47,7 @@ func Login(username string, password string) (string, error) {
 	result := map[string]any{}
 
 	// we make a query, getting the password and id
-	db.Model(&model.Users{}).Select("password, id, token, blacklist").Where("username = ?", username).Find(&result)
+	db.Model(&model.Users{}).Select("password, id, token, blacklist").Where("username = ? OR email = ?", username, username).Find(&result)
 
 	// Em SQL: SELECT senha, id FROM users WHERE usuario=usuario
 	// we pass the hashedPass to string
@@ -53,11 +56,9 @@ func Login(username string, password string) (string, error) {
 	// we verify if the password is correct
 	err := argonpass.Verify(password, hashedPassword)
 
-	fmt.Println(hashedPassword)
 	if err != nil {
 		return "", errors.New("invalid credentials")
 	}
-	fmt.Println(result)
 	if result["blacklist"] != nil {
 		return "", errors.New("the user is currently blacklisted")
 	}
@@ -99,14 +100,16 @@ func Register(username string, password string, email string, inviteCode string)
 
 	// verify if we created the user
 	if create.Error != nil {
-		return create.Error
+		return errors.New("an error occurred. Please contact an admin")
 	}
 
 	// update the invite row
 	if invite {
-		db.Model(&model.Invites{}).Where("code = ?", inviteCode).Updates(model.Invites{UsedBy: username, UsedByID: int(user.ID)})
+		db.Model(&model.Invites{}).Where("code = ?", inviteCode).Updates(model.Invites{UsedByID: int(user.ID)})
 	}
 
+	embed := model.Embeds{Title: "I'm using Floppa.Host!", Description: "Floppa.host is good!", Author: "Floppa", Color: "random", Enabled: true, UserID: int(user.ID)}
+	db.Create(&embed)
 	return nil
 }
 
@@ -209,4 +212,43 @@ func UnblacklistUser(jwt string, username string, reason string) error {
 	}
 	
 	return nil
+}
+
+func Upload(author string, name string, description string, title string, enabled bool, userid int, object string, color string, uploadId string, fileName string) error {
+	db := DB
+	
+	upload := model.Uploads{EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Object: object, Color: color, UploadID: uploadId, FileName: fileName}
+	query := db.Create(&upload)
+	
+	if query.Error != nil {
+		return errors.New("something wrong happened")
+	}
+	return nil
+}
+
+func GetUpload(uploadId string) (map[string]any, error) {
+	db := DB
+	result := map[string]any{}
+	db.Model(&model.Uploads{}).Where("upload_id = ?", uploadId).Find(&result)
+	if len(result) <= 0 {
+		return nil, errors.New("the upload doesn't exist")
+	}
+	return result, nil
+}
+
+func GetEmbed(ApiKey string) (map[string]any, error) {
+	db := DB
+	user := map[string]any{}
+
+	db.Model(&model.Users{}).Where("api_key = ?", ApiKey).Find(&user)
+	result := map[string]any{}
+
+
+	db.Model(&model.Embeds{}).Where("user_id = ?", user["id"]).Find(&result)
+
+	if len(result) == 0 {
+		return nil, errors.New("invalid api key")
+	}
+
+	return result, nil
 }

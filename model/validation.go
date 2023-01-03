@@ -5,4 +5,5 @@ type UserValidation struct {
 	Admin       bool
 	Blacklisted bool
 	Username    string
+	Uid         int
 }
