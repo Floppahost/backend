@@ -12,5 +12,4 @@ type Users struct {
 	InviteBan bool   `gorm:"not null;default:false"`
 	Admin     bool   `gorm:"not null;default:false"`
 	Blacklist string `gorm:"default:null"`
-	Domain 	  string `gorm:"default:floppa.host"`
 }

@@ -12,24 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func VerifyUser(jwt string) model.UserValidation {
+func VerifyUser(token string) model.UserValidation {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Users{}).Select("blacklist, admin, username, id").Where("token = ?", jwt).Find(&result)
-	if len(result) == 0 {
-		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: "", Uid: -1}
-	}
-	admin, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
-	blacklisted := result["blacklist"] != nil
-	username := fmt.Sprintf("%s", result["username"])
-	uid, _ := strconv.ParseInt(fmt.Sprintf("%s", result["id"]), 64, 64)
-	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true, Username: username, Uid: int(uid)}
-}
-
-func VerifyUserApiKey(api string) model.UserValidation {
-	db := DB
-	result := map[string]any{}
-	db.Model(&model.Users{}).Select("blacklist, admin, username, id").Where("api_key = ?", api).Find(&result)
+	db.Model(&model.Users{}).Select("blacklist, admin, username, id").Where("token = ? OR api_key = ?", token, token).Find(&result)
 	if len(result) == 0 {
 		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: "", Uid: -1}
 	}
@@ -108,7 +94,7 @@ func Register(username string, password string, email string, inviteCode string)
 		db.Model(&model.Invites{}).Where("code = ?", inviteCode).Updates(model.Invites{UsedByID: int(user.ID)})
 	}
 
-	embed := model.Embeds{Title: "I'm using Floppa.Host!", Description: "Floppa.host is good!", Author: "Floppa", Color: "random", Enabled: true, UserID: int(user.ID)}
+	embed := model.Embeds{UserID: int(user.ID)}
 	db.Create(&embed)
 	return nil
 }
@@ -236,19 +222,62 @@ func GetUpload(uploadId string) (map[string]any, error) {
 	return result, nil
 }
 
-func GetEmbed(ApiKey string) (map[string]any, error) {
+func GetEmbed(token string) (map[string]any, error) {
 	db := DB
-	user := map[string]any{}
+	userClaims := VerifyUser(token)
 
-	db.Model(&model.Users{}).Where("api_key = ?", ApiKey).Find(&user)
+	if !userClaims.ValidUser {
+		return nil, errors.New("invalid token")
+	}
+
 	result := map[string]any{}
-
-
-	db.Model(&model.Embeds{}).Where("user_id = ?", user["id"]).Find(&result)
+	db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Find(&result)
 
 	if len(result) == 0 {
-		return nil, errors.New("invalid api key")
+		return nil, errors.New("invalid authorization token")
 	}
 
 	return result, nil
+}
+
+func UpdateEmbed(token string, author string, description string, title string, name string) error {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return errors.New("unauthorized")
+	}
+
+	uid := userClaims.Uid
+	
+	db.Model(&model.Embeds{}).Where("user_id = ?", uid).Updates(model.Embeds{Title: title, Author: author, Description: description, Name: name})
+	return nil
+}
+
+func UpdateDomain(token string, domain string) error {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return errors.New("unauthorized")
+	}
+
+	uid := userClaims.Uid
+	
+	domains := map[string]any{}
+	db.Model(&model.Domains{}).Where("domain = ?", domain).Find(&domains)
+
+	validDomain := len(domains) > 0
+
+	if !validDomain {
+		return errors.New("invalid domain")
+	}
+	
+	query := db.Model(&model.Embeds{}).Where("user_id = ?", uid).Update("domain", domain)
+
+	if query.Error != nil {
+		return errors.New("something unexpected happened; please contact an admin")
+	}
+
+	return nil
 }

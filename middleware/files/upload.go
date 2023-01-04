@@ -17,8 +17,8 @@ import (
 
 func Upload(c *fiber.Ctx) error {
 	headers := c.GetReqHeaders()
-	apikey := headers["Apikey"]
-	userClaims := database.VerifyUserApiKey(apikey)
+	apikey := headers["Authorization"]
+	userClaims := database.VerifyUser(apikey)
 	if (!userClaims.ValidUser) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "Unauthorized"})
 	}

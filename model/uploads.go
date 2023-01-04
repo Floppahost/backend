@@ -13,5 +13,6 @@ type Uploads struct {
 	Author      string
 	Color       string
 	EmbedEnabled bool
+	Domain		string
 	FileName 	string
 }
