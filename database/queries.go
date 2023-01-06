@@ -281,3 +281,18 @@ func UpdateDomain(token string, domain string) error {
 
 	return nil
 }
+
+func GetDomains(token string) ([]map[string]any, error) {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return nil, errors.New("unauthorized")
+	}
+
+	result := []map[string]any{} 
+	db.Raw("SELECT domain, wildcard, username FROM domains INNER JOIN users ON domains.by_uid = users.id").Find(&result)
+
+	fmt.Println(result)
+	return result, nil
+}
