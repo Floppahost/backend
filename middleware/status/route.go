@@ -1,4 +1,4 @@
-package profile
+package status
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -7,7 +7,7 @@ import (
 func Routes(router fiber.Router) {
 	group := router.Group("/")
 
-	group.Get("get/:profile", GetData)
+	group.Get("/invite", GetInviteStatus)
 
 }
 

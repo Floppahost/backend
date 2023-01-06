@@ -6,6 +6,7 @@ import (
 	"github.com/floppahost/backend/middleware/files"
 	"github.com/floppahost/backend/middleware/preferences"
 	"github.com/floppahost/backend/middleware/profile"
+	"github.com/floppahost/backend/middleware/status"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -17,10 +18,12 @@ func ConnectRouter(app *fiber.App) {
 	profileRoute := app.Group("/profile", logger.New(logger.Config{}))
 	adminRoute := app.Group("/admin", logger.New(logger.Config{}))
 	preferencesRoute := app.Group("/preferences", logger.New(logger.Config{}))
+	statusRoute := app.Group("/status", logger.New(logger.Config{}))
 
 	profile.Routes(profileRoute)
 	auth.Routes(authRoute)
 	files.Routes(filesRoute)
 	admin.Routes(adminRoute)
 	preferences.Routes(preferencesRoute)
+	status.Routes(statusRoute)
 }

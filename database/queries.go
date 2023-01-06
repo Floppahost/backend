@@ -106,7 +106,7 @@ func GetProfile(user string) (string, error) {
 	result := map[string]any{}
 
 	// we make a query, getting the password and id
-	db.Model(model.Users{}).Where("user = ?", string(user)).First(&result)
+	db.Model(model.Users{}).Where("username = ?", user).Scan(&result)
 	id := result["id"]
 
 	if id == nil {
@@ -301,3 +301,4 @@ func GetDomains(token string) ([]map[string]any, error) {
 	fmt.Println(result)
 	return result, nil
 }
+

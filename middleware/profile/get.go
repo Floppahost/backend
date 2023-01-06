@@ -3,19 +3,24 @@ package profile
 import (
 	"fmt"
 
-	"github.com/goccy/go-json"
-
 	"github.com/floppahost/backend/database"
 	"github.com/gofiber/fiber/v2"
 )
 
 type User struct {
-	Usuario string `json:"usuario"`
+	User 	string 	 `json:"username"`
 	ID      string   `json:"ID"`
 }
 
 
 func GetData(c *fiber.Ctx) error {
+	headers := c.GetReqHeaders()
+	apikey := headers["Authorization"]
+	userClaims := database.VerifyUser(apikey)
+	if (!userClaims.ValidUser) {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "Unauthorized"})
+	}
+
 	profile := c.Params("profile")
 	fmt.Println(profile)
 	id, err := database.GetProfile(profile)
@@ -25,12 +30,11 @@ func GetData(c *fiber.Ctx) error {
 	}
 
 	user := User{
-		Usuario: profile,
+		User: profile,
 		ID: id,
 	}
 	
-	userJson, _ := json.Marshal(user)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "success", "data": string(userJson)})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "success", "data": user})
 
 	// FUTURE: redisgn user
 }
