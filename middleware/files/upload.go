@@ -43,13 +43,14 @@ func Upload(c *fiber.Ctx) error {
 	for i := 1; len(fileNameSplit) > i; i++ {
 			fileExtension = fileExtension + "." + fileNameSplit[i]
 	}
-}
+	}
 
 	generated_uuid := uuid.NewString()
 	objectName := generated_uuid + fileExtension
 
 	info, err := Bucket.FPutObject(ctx, "files", objectName, path, minio.PutObjectOptions{ContentType: fileHeader})
 	if err != nil {
+		fmt.Println(err)
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something weird happened. Please, try again; if the error persists, contact the support"})
 	}
 	os.Remove(path)
@@ -61,9 +62,11 @@ func Upload(c *fiber.Ctx) error {
 	name := func() string {b := fmt.Sprintf("%v", embed["name"]); if embed["name"] == nil {b = ""}; return b}
 	title := func() string {b := fmt.Sprintf("%v", embed["title"]); if embed["title"] == nil {b = ""}; return b}
 	embedColor := func() string {b := fmt.Sprintf("%v", embed["title"]); if embed["title"] == nil {b = ""}; return b}
+	domain := fmt.Sprintf("%v", embed["domain"])
 	enabled, _ := strconv.ParseBool(fmt.Sprintf("%v", embed["enabled"]))
 
 	color := embedColor()
+	
 	if color == "random" {
 		color = randomcolor.GetRandomColorInHex()
 	}
@@ -72,7 +75,8 @@ func Upload(c *fiber.Ctx) error {
 		return erro
 	}
 	
-
-	database.Upload(author(), name(), description(), title(), enabled, userClaims.Uid, info.Key, color, generated_uuid, fileName)
+	file_url := "cdn.floppa.host/files/" +  objectName
+	upload_url := domain + "/i/" + generated_uuid
+	database.Upload(author(), name(), description(), title(), enabled, userClaims.Uid, info.Key, color, generated_uuid, fileName, file_url, upload_url, apikey)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success", "uploadId": generated_uuid})
 }

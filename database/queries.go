@@ -200,10 +200,15 @@ func UnblacklistUser(jwt string, username string, reason string) error {
 	return nil
 }
 
-func Upload(author string, name string, description string, title string, enabled bool, userid int, object string, color string, uploadId string, fileName string) error {
+func Upload(author string, name string, description string, title string, enabled bool, userid int, object string, color string, uploadId string, fileName string, file_url string, upload_url string, token string) error {
 	db := DB
 	
-	upload := model.Uploads{EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Object: object, Color: color, UploadID: uploadId, FileName: fileName}
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return errors.New("unauthorized")
+	}
+	upload := model.Uploads{EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Object: object, Color: color, UploadID: uploadId, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url}
 	query := db.Create(&upload)
 	
 	if query.Error != nil {
@@ -215,7 +220,7 @@ func Upload(author string, name string, description string, title string, enable
 func GetUpload(uploadId string) (map[string]any, error) {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Uploads{}).Where("upload_id = ?", uploadId).Find(&result)
+	db.Model(&model.Uploads{}).Select("file_url", "created_at", "color", "upload_id", "object", "user_id", "title", "description", "author", "embed_enabled", "file_name").Where("upload_id = ?", uploadId).Find(&result)
 	if len(result) <= 0 {
 		return nil, errors.New("the upload doesn't exist")
 	}

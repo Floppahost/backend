@@ -4,6 +4,8 @@ import "gorm.io/gorm"
 
 type Uploads struct {
 	gorm.Model
+	UploadUrl string
+	FileUrl string
 	UploadID 	string
 	Object 		string 
 	UserID      int `gorm:"primarykey"`
@@ -13,6 +15,5 @@ type Uploads struct {
 	Author      string
 	Color       string
 	EmbedEnabled bool
-	Domain		string
 	FileName 	string
 }
