@@ -15,6 +15,9 @@ func GetDomains(c *fiber.Ctx) error {
 	domains, err := database.GetDomains(token)
 
 	if err != nil {
+		if fmt.Sprintf("%v", err) == "unauthorized" {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "unauthorized"})
+		}
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": fmt.Sprintf("%s", err)})
 	}
 

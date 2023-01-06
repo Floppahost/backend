@@ -8,6 +8,5 @@ func Routes(router fiber.Router) {
 	group := router.Group("/")
 
 	group.Get("/invite", GetInviteStatus)
-
 }
 

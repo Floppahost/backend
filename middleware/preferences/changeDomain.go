@@ -1,6 +1,8 @@
 package preferences
 
 import (
+	"fmt"
+
 	"github.com/floppahost/backend/database"
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,7 +22,10 @@ func ChangeDomain(c *fiber.Ctx) error {
 	err := database.UpdateDomain(token, parser.Domain)
 
 	if err != nil {
-		return c.Status(404).JSON(fiber.Map{"error": false, "message": "This domain doesn't exist"})
+		if fmt.Sprintf("%v", err) == "unauthorized" {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "unauthorized"})
+		}
+		return c.Status(404).JSON(fiber.Map{"error": false, "message": "this domain doesn't exist"})
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success"})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "success"})
 }

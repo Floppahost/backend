@@ -302,3 +302,30 @@ func GetDomains(token string) ([]map[string]any, error) {
 	return result, nil
 }
 
+func ChangePassword(token string, old_password string, new_password string) error {
+	db := DB
+
+	old_pass := map[string]any{}
+	db.Model(&model.Users{}).Select("password").Where("token = ?", token).Scan(&old_pass)
+
+	if len(old_pass) <= 0 {
+		return errors.New("unauthorized")
+	}
+
+	hashed_old_password := fmt.Sprintf("%v", old_pass["password"])
+	err := argonpass.Verify(old_password, hashed_old_password)
+
+	if err != nil {
+		return errors.New("invalid old password")
+	}
+
+	hashed_new_password, err := argonpass.Hash(new_password, nil)
+
+	if err != nil {
+		return err
+	}
+
+	db.Model(&model.Users{}).Where("token = ?", token).Update("password", hashed_new_password)	
+	return nil
+}
+

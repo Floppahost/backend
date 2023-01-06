@@ -20,7 +20,7 @@ func Upload(c *fiber.Ctx) error {
 	apikey := headers["Authorization"]
 	userClaims := database.VerifyUser(apikey)
 	if (!userClaims.ValidUser) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "Unauthorized"})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "unauthorized"})
 	}
 
 	ctx := context.Background()

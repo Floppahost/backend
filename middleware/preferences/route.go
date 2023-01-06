@@ -15,4 +15,6 @@ func Routes(router fiber.Router) {
 	get.Get("/embed", GetEmbed)
 
 	get.Get("/domains", GetDomains)
+
+	change.Post("/password", ChangePassword)
 }
