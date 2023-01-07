@@ -17,4 +17,6 @@ func Routes(router fiber.Router) {
 	get.Get("/domains", GetDomains)
 
 	change.Post("/password", ChangePassword)
+
+	get.Get("/uploads", GetUploads)
 }

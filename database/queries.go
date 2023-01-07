@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 
@@ -327,5 +328,26 @@ func ChangePassword(token string, old_password string, new_password string) erro
 
 	db.Model(&model.Users{}).Where("token = ?", token).Update("password", hashed_new_password)	
 	return nil
+}
+
+func GetUploads(token string, page int) ([]map[string]any, float64, error) {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return nil, 0, errors.New("unauthorized")
+	}
+
+	result := []map[string]any{}
+	limit := page * 10
+
+	all := []map[string]any{}
+	// SELECT * FROM uploads WHERE user_id = n ORDER BY id LIMIT limit;
+	db.Model(&model.Uploads{}).Select("id, upload_url, file_url").Where("user_id = ? AND id <= ? AND id >= ?", userClaims.Uid, limit, limit-10).Order("id desc").Limit(limit).Scan(&result)
+	query := db.Model(&model.Uploads{}).Select("id").Where("user_id = ?", userClaims.Uid).Scan(&all)
+	 float, _ := strconv.ParseFloat(fmt.Sprintf("%v", query.RowsAffected/10), 64)
+	 maxPages := math.Floor(float)+1
+	 fmt.Println(query.RowsAffected)
+	return result, maxPages, nil
 }
 
