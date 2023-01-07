@@ -78,5 +78,5 @@ func Upload(c *fiber.Ctx) error {
 	file_url := "cdn.floppa.host/files/" +  objectName
 	upload_url := domain + "/i/" + generated_uuid
 	database.Upload(author(), name(), description(), title(), enabled, userClaims.Uid, info.Key, color, generated_uuid, fileName, file_url, upload_url, apikey)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success", "uploadId": generated_uuid})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success", "url": upload_url, "file_url": file_url})
 }

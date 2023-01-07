@@ -6,4 +6,6 @@ type UserValidation struct {
 	Blacklisted bool
 	Username    string
 	Uid         int
+	JWT         string
+	ApiKey      string
 }

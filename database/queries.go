@@ -16,15 +16,17 @@ import (
 func VerifyUser(token string) model.UserValidation {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Users{}).Select("blacklist, admin, username, id").Where("token = ? OR api_key = ?", token, token).Find(&result)
+	db.Model(&model.Users{}).Select("blacklist, admin, username, id, api_key, token").Where("token = ? OR api_key = ?", token, token).Find(&result)
 	if len(result) == 0 {
 		return model.UserValidation{Admin: false, ValidUser: false, Blacklisted: false, Username: "", Uid: -1}
 	}
 	admin, _ := strconv.ParseBool(fmt.Sprintf("%v", result["admin"]))
 	blacklisted := result["blacklist"] != nil
 	username := fmt.Sprintf("%s", result["username"])
+	jwt := fmt.Sprintf("%s", result["token"])
+	api_key := fmt.Sprintf("%s", result["api_key"])
 	uid, _ := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
-	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true, Username: username, Uid: int(uid)}
+	return model.UserValidation{Admin: admin, Blacklisted: blacklisted, ValidUser: true, Username: username, Uid: int(uid), JWT: jwt, ApiKey: api_key}
 }
 
 func Login(username string, password string) (string, error) {
