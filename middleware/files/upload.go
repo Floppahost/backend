@@ -6,16 +6,19 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/AvraamMavridis/randomcolor"
 	"github.com/floppahost/backend/buck"
 	"github.com/floppahost/backend/database"
+	"github.com/floppahost/backend/lib"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 )
 
 func Upload(c *fiber.Ctx) error {
+	startTime := time.Now()
 	headers := c.GetReqHeaders()
 	apikey := headers["Authorization"]
 	userClaims := database.VerifyUser(apikey)
@@ -32,7 +35,8 @@ func Upload(c *fiber.Ctx) error {
 
 	Bucket := buck.Bucket
 	path := fmt.Sprintf("%s%s", os.Getenv("FILE_PATH"), file.Filename)
-	c.SaveFile(file, fmt.Sprintf("./%s", path))
+	filePath := fmt.Sprintf("./%s", path)
+	c.SaveFile(file, filePath)
 	fileName := file.Filename
 	fileHeader := fmt.Sprintf("%s", file.Header)
 
@@ -53,6 +57,8 @@ func Upload(c *fiber.Ctx) error {
 		fmt.Println(err)
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something weird happened. Please, try again; if the error persists, contact the support"})
 	}
+
+	fileSize := file.Size
 	os.Remove(path)
 
 	embed, erro := database.GetEmbed(apikey)
@@ -77,6 +83,9 @@ func Upload(c *fiber.Ctx) error {
 	
 	file_url := "cdn.floppa.host/files/" +  objectName
 	upload_url := domain + "/i/" + generated_uuid
-	database.Upload(author(), name(), description(), title(), enabled, userClaims.Uid, info.Key, color, generated_uuid, fileName, file_url, upload_url, apikey)
+
+	endTime := time.Since(startTime)
+	embedFields := lib.EmbedPlaceholders(title(), description(), name(), author(), apikey, fileSize, fileName, endTime)
+	database.Upload(embedFields.Author, embedFields.Name, embedFields.Description, embedFields.Title, enabled, userClaims.Uid, info.Key, color, generated_uuid, fileName, file_url, upload_url, apikey)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success", "url": upload_url, "file_url": file_url})
 }

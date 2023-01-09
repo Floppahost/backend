@@ -353,3 +353,15 @@ func GetUploads(token string, page int) ([]map[string]any, float64, error) {
 	return result, maxPages, nil
 }
 
+func GetUploadCounter(token string) (int, error) {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return 0, errors.New("unauthorized")
+	}
+
+	var uploads int64
+	db.Model(&model.Uploads{}).Where("user_id = ?", userClaims.Uid).Count(&uploads)
+	return int(uploads), nil
+}
