@@ -365,3 +365,46 @@ func GetUploadCounter(token string) (int, error) {
 	db.Model(&model.Uploads{}).Where("user_id = ?", userClaims.Uid).Count(&uploads)
 	return int(uploads), nil
 }
+
+func ChangePathValue(token string, value string) error {
+	db := DB
+
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return errors.New("unauthorized")
+	}
+
+	query := db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Update("path", value)
+
+	if query.Error != nil {
+		return errors.New("something unexpected happened; please contact an admin")
+	}
+
+	return nil
+}
+
+func ChangePathMode(token string, mode string, amount int) error {
+	db := DB
+
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return errors.New("unauthorized")
+	}
+
+	if mode != "invisible" && mode != "custom" {
+		query := db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Updates(model.Embeds{Path_Mode: mode, Path_Amount: amount})
+
+		if query.Error != nil {
+			return errors.New("something unexpected happened; please contact an admin")
+		}
+		return nil
+	}
+
+	query := db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Update("mode", mode)
+	if query.Error != nil {
+		return errors.New("something unexpected happened; please contact an admin")
+	}
+	return nil
+}

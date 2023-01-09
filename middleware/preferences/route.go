@@ -21,4 +21,6 @@ func Routes(router fiber.Router) {
 	get.Get("/uploads", GetUploads)
 
 	get.Get("/config", GetConfig)
+
+	change.Post("/path", ChangePath)
 }

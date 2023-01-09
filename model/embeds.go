@@ -6,7 +6,7 @@ import (
 
 type Embeds struct {
 	gorm.Model
-	UserID   	int    `gorm:"primarykey"`
+	UserID   	int    `gorm:"unique;primarykey"`
 	Name 		string `gorm:"default:Floppa!"`
 	Title       string `gorm:"default:I am using Floppa.host!"`
 	Description string `gorm:"default:Floppa.host is good!"`
@@ -14,6 +14,9 @@ type Embeds struct {
 	Color       string `gorm:"default:random"`
 	Enabled 	bool   `gorm:"default:true"`
 	Domain 	  	string `gorm:"default:floppa.host"`
+	Path		string
+	Path_Mode	string `gorm:"default:invisible"`
+	Path_Amount int 
 }
 
 type EmbedStruct struct {

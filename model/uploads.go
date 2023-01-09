@@ -4,16 +4,17 @@ import "gorm.io/gorm"
 
 type Uploads struct {
 	gorm.Model
-	UploadUrl string
-	FileUrl string
-	UploadID 	string
-	Object 		string 
-	UserID      int `gorm:"primarykey"`
+	UploadUrl string   `gorm:"unique"`
+	FileUrl string	   `gorm:"unique"`
+	UploadID 	string `gorm:"unique"`
+	Object 		string  `gorm:"unique"`
+	UserID      int 	`gorm:"primarykey"`
 	Name 		string
 	Title       string
 	Description string
 	Author      string
 	Color       string
 	EmbedEnabled bool
-	FileName 	string
+	FileName 	string 
+	Path		string `gorm:"unique;not null"`
 }
