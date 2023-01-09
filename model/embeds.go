@@ -15,8 +15,8 @@ type Embeds struct {
 	Enabled 	bool   `gorm:"default:true"`
 	Domain 	  	string `gorm:"default:floppa.host"`
 	Path		string
-	Path_Mode	string `gorm:"default:invisible"`
-	Path_Amount int 
+	Path_Mode	string `gorm:"not null;default:invisible"`
+	Path_Amount int    `gorm:"not null;default:5"`
 }
 
 type EmbedStruct struct {

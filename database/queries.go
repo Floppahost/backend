@@ -203,7 +203,7 @@ func UnblacklistUser(jwt string, username string, reason string) error {
 	return nil
 }
 
-func Upload(author string, name string, description string, title string, enabled bool, userid int, object string, color string, uploadId string, fileName string, file_url string, upload_url string, token string) error {
+func Upload(author string, name string, description string, title string, enabled bool, path string, userid int, object string, color string, uploadId string, fileName string, file_url string, upload_url string, token string) error {
 	db := DB
 	
 	userClaims := VerifyUser(token)
@@ -211,7 +211,7 @@ func Upload(author string, name string, description string, title string, enable
 	if !userClaims.ValidUser {
 		return errors.New("unauthorized")
 	}
-	upload := model.Uploads{EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Object: object, Color: color, UploadID: uploadId, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url}
+	upload := model.Uploads{Path: path, EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Object: object, Color: color, UploadID: uploadId, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url}
 	query := db.Create(&upload)
 	
 	if query.Error != nil {
@@ -402,7 +402,7 @@ func ChangePathMode(token string, mode string, amount int) error {
 		return nil
 	}
 
-	query := db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Update("mode", mode)
+	query := db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Update("path_mode", mode)
 	if query.Error != nil {
 		return errors.New("something unexpected happened; please contact an admin")
 	}

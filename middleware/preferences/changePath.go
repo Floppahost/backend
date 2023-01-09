@@ -83,6 +83,7 @@ func validateMode(mode string, path string, amount int) error {
 	if (mode == "amongus" || mode == "amongus_emoji" || mode == "emoji") && amount > 5 {
 		return errors.New("the amount can not be greater than five")
 	}
+
 	if mode == "custom" && path == "" {
 		return errors.New("path can not be blank")
 	}
