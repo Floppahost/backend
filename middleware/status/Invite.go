@@ -4,10 +4,15 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/floppahost/backend/lib"
 	"github.com/gofiber/fiber/v2"
 )
 
 func GetInviteStatus(c *fiber.Ctx) error {
+	lib.InvisibleUrl(10)
+	lib.RandomEmoji(10)
+	lib.AmongUs(10)
+	lib.AmongUsAndEmoji(10)
 	invite := os.Getenv("INVITE_ONLY")
 
 	inviteBool, err := strconv.ParseBool(invite)

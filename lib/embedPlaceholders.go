@@ -18,8 +18,6 @@ func EmbedPlaceholders(title string, description string, name string, author str
 	placeholders[3] = "$size$"
 	placeholders[4] = "$filename$"
 	placeholders[5] = "$uid$"
-
-	fmt.Println(placeholders[1])
 	uploadCounter, _ := database.GetUploadCounter(token)
 	userClaims := database.VerifyUser(token)
 	
@@ -48,7 +46,5 @@ func EmbedPlaceholders(title string, description string, name string, author str
 	newDescription := substituteValue(description)
 	newName := substituteValue(name)
 	newAuthor := substituteValue(author)
-
-
 	return model.EmbedStruct{Title: newTitle, Description: newDescription, Name: newName, Author: newAuthor}
 }
