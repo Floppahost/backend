@@ -14,6 +14,8 @@ import (
 	"github.com/floppahost/backend/router"
 )
 
+var UnauthorizedErr = "you don't have permission to perform this action"
+
 func main() {
 
 	// declaramos a var app para o Fiber, tudo via a nossa config

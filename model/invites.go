@@ -8,6 +8,6 @@ import (
 type Invites struct {
 	gorm.Model
 	UserID   int       `gorm:"primarykey"`
-	Code     uuid.UUID `gorm:"unique;type:uuid;default:uuid_generate_v4()"`
+	Code     uuid.UUID `gorm:"unique;type:uuid;default:gen_random_uuid()"`
 	UsedByID int       `gorm:"default:null"`
 }

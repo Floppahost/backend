@@ -177,11 +177,11 @@ func BlacklistUser(jwt string, username string, reason string) error {
 	}
 
 	query := db.Model(&model.Users{}).Where("username = ?", username).Updates(model.Users{Blacklist: reason})
-	
+
 	if query.Error != nil {
 		return errors.New("the requested user doesn't exist")
 	}
-	
+
 	return nil
 }
 
@@ -195,25 +195,25 @@ func UnblacklistUser(jwt string, username string, reason string) error {
 	}
 
 	query := db.Model(&model.Users{}).Where("username = ?", username).Updates(model.Users{Blacklist: ""})
-	
+
 	if query.Error != nil {
 		return errors.New("the requested user doesn't exist")
 	}
-	
+
 	return nil
 }
 
-func Upload(author string, name string, description string, title string, enabled bool, path string, userid int, object string, color string, uploadId string, fileName string, file_url string, upload_url string, token string) error {
+func Upload(author string, name string, description string, title string, enabled bool, userid int, color string, fileName string, file_url string, upload_url string, path string, upload_id string, token string) error {
 	db := DB
-	
+
 	userClaims := VerifyUser(token)
 
 	if !userClaims.ValidUser {
 		return errors.New("unauthorized")
 	}
-	upload := model.Uploads{Path: path, EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Object: object, Color: color, UploadID: uploadId, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url}
+	upload := model.Uploads{Path: path, EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Color: color, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url, UploadID: upload_id}
 	query := db.Create(&upload)
-	
+
 	if query.Error != nil {
 		return errors.New("something wrong happened")
 	}
@@ -257,7 +257,7 @@ func UpdateEmbed(token string, author string, description string, title string, 
 	}
 
 	uid := userClaims.Uid
-	
+
 	db.Model(&model.Embeds{}).Where("user_id = ?", uid).Updates(model.Embeds{Title: title, Author: author, Description: description, Name: name})
 	return nil
 }
@@ -271,7 +271,7 @@ func UpdateDomain(token string, domain string) error {
 	}
 
 	uid := userClaims.Uid
-	
+
 	domains := map[string]any{}
 	db.Model(&model.Domains{}).Where("domain = ?", domain).Find(&domains)
 
@@ -280,7 +280,7 @@ func UpdateDomain(token string, domain string) error {
 	if !validDomain {
 		return errors.New("invalid domain")
 	}
-	
+
 	query := db.Model(&model.Embeds{}).Where("user_id = ?", uid).Update("domain", domain)
 
 	if query.Error != nil {
@@ -298,7 +298,7 @@ func GetDomains(token string) ([]map[string]any, error) {
 		return nil, errors.New("unauthorized")
 	}
 
-	result := []map[string]any{} 
+	result := []map[string]any{}
 	db.Raw("SELECT domain, wildcard, username FROM domains INNER JOIN users ON domains.by_uid = users.id").Find(&result)
 
 	fmt.Println(result)
@@ -328,7 +328,7 @@ func ChangePassword(token string, old_password string, new_password string) erro
 		return err
 	}
 
-	db.Model(&model.Users{}).Where("token = ?", token).Update("password", hashed_new_password)	
+	db.Model(&model.Users{}).Where("token = ?", token).Update("password", hashed_new_password)
 	return nil
 }
 
@@ -347,9 +347,9 @@ func GetUploads(token string, page int) ([]map[string]any, float64, error) {
 	// SELECT * FROM uploads WHERE user_id = n ORDER BY id LIMIT limit;
 	db.Model(&model.Uploads{}).Select("id, upload_url, file_url").Where("user_id = ? AND id <= ? AND id >= ?", userClaims.Uid, limit, limit-10).Order("id desc").Limit(limit).Scan(&result)
 	query := db.Model(&model.Uploads{}).Select("id").Where("user_id = ?", userClaims.Uid).Scan(&all)
-	 float, _ := strconv.ParseFloat(fmt.Sprintf("%v", query.RowsAffected/10), 64)
-	 maxPages := math.Floor(float)+1
-	 fmt.Println(query.RowsAffected)
+	float, _ := strconv.ParseFloat(fmt.Sprintf("%v", query.RowsAffected/10), 64)
+	maxPages := math.Floor(float) + 1
+	fmt.Println(query.RowsAffected)
 	return result, maxPages, nil
 }
 
@@ -407,4 +407,40 @@ func ChangePathMode(token string, mode string, amount int) error {
 		return errors.New("something unexpected happened; please contact an admin")
 	}
 	return nil
+}
+
+func DeleteUpload(token string, upload string) (model.UserValidation, error) {
+	db := DB
+
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return userClaims, errors.New("unauthorized")
+	}
+
+	query := db.Where("user_id = ? AND upload_id = ?", userClaims.Uid, upload).Delete(&model.Uploads{})
+
+	if query.Error != nil {
+		return userClaims, errors.New("invalid upload")
+	}
+	return userClaims, nil
+}
+
+func ValidateUpload(token string, upload string) (model.UserValidation, error) {
+	db := DB
+
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser {
+		return userClaims, errors.New("unauthorized")
+	}
+
+	result := map[string]any{}
+	db.Model(&model.Uploads{}).Where("user_id = ? AND upload_id = ?", userClaims.Uid, upload).Scan(&result)
+
+	if len(result) <= 0 {
+		return userClaims, errors.New("invalid upload")
+	}
+
+	return userClaims, nil
 }

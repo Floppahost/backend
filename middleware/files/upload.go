@@ -22,7 +22,7 @@ func Upload(c *fiber.Ctx) error {
 	headers := c.GetReqHeaders()
 	apikey := headers["Authorization"]
 	userClaims := database.VerifyUser(apikey)
-	if (!userClaims.ValidUser) {
+	if !userClaims.ValidUser {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "unauthorized"})
 	}
 
@@ -44,15 +44,15 @@ func Upload(c *fiber.Ctx) error {
 	fileExtension := ""
 
 	if len(fileNameSplit) >= 1 {
-	for i := 1; len(fileNameSplit) > i; i++ {
+		for i := 1; len(fileNameSplit) > i; i++ {
 			fileExtension = fileExtension + "." + fileNameSplit[i]
-	}
+		}
 	}
 
 	generated_uuid := uuid.NewString()
 	objectName := generated_uuid + fileExtension
 
-	info, err := Bucket.FPutObject(ctx, "files", objectName, fsPath, minio.PutObjectOptions{ContentType: fileHeader})
+	_, err = Bucket.FPutObject(ctx, "files", objectName, fsPath, minio.PutObjectOptions{ContentType: fileHeader})
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something weird happened. Please, try again; if the error persists, contact the support"})
@@ -61,57 +61,94 @@ func Upload(c *fiber.Ctx) error {
 	fileSize := file.Size
 	os.Remove(fsPath)
 
-	embed, erro := database.GetEmbed(apikey)
+	embed, err := database.GetEmbed(apikey)
 
-	author := func() string {b := fmt.Sprintf("%v", embed["author"]); if embed["author"] == nil {b = ""}; return b}
-	description := func() string {b := fmt.Sprintf("%v", embed["description"]); if embed["description"] == nil {b = ""}; return b}
-	name := func() string {b := fmt.Sprintf("%v", embed["name"]); if embed["name"] == nil {b = ""}; return b}
-	title := func() string {b := fmt.Sprintf("%v", embed["title"]); if embed["title"] == nil {b = ""}; return b}
-	embedColor := func() string {b := fmt.Sprintf("%v", embed["title"]); if embed["title"] == nil {b = ""}; return b}
+	author := func() string {
+		b := fmt.Sprintf("%v", embed["author"])
+		if embed["author"] == nil {
+			b = ""
+		}
+		return b
+	}
+	description := func() string {
+		b := fmt.Sprintf("%v", embed["description"])
+		if embed["description"] == nil {
+			b = ""
+		}
+		return b
+	}
+	name := func() string {
+		b := fmt.Sprintf("%v", embed["name"])
+		if embed["name"] == nil {
+			b = ""
+		}
+		return b
+	}
+	title := func() string {
+		b := fmt.Sprintf("%v", embed["title"])
+		if embed["title"] == nil {
+			b = ""
+		}
+		return b
+	}
+	embedColor := func() string {
+		b := fmt.Sprintf("%v", embed["title"])
+		if embed["title"] == nil {
+			b = ""
+		}
+		return b
+	}
 	domain := fmt.Sprintf("%v", embed["domain"])
 	path_mode := fmt.Sprintf("%v", embed["path_mode"])
 	path_amount, _ := strconv.ParseInt(fmt.Sprintf("%v", embed["path_amount"]), 10, 64)
-	path_value := func() string {b := fmt.Sprintf("%v", embed["path"]); if embed["path"] == nil {b = "hello"}; return b}
+	path_value := func() string {
+		b := fmt.Sprintf("%v", embed["path"])
+		if embed["path"] == nil {
+			b = "hello"
+		}
+		return b
+	}
 	enabled, _ := strconv.ParseBool(fmt.Sprintf("%v", embed["enabled"]))
 
 	color := embedColor()
-	
+
 	if color == "random" {
 		color = randomcolor.GetRandomColorInHex()
 	}
 
-	if erro != nil {
-		return erro
+	if err != nil {
+		return err
 	}
-	
+
 	var path string
 	var upload_url string
 	switch path_mode {
-		case "amongus":
-			path = lib.AmongUs(int(path_amount))
-			upload_url = path
-		case "amongus_emoji":
-			path = lib.AmongUsAndEmoji(int(path_amount))
-			upload_url = path
-		case "emoji":
-			path = lib.RandomEmoji(int(path_amount))
-			upload_url = path
-		case "invisible":
-			path = lib.InvisibleUrl(15)
-			upload_url = path
-		case "custom":
-			path = path_value() + lib.InvisibleUrl(15)
-			upload_url = path
-		default: 
-			path = generated_uuid
-			upload_url = path
+	case "amongus":
+		path = lib.AmongUs(int(path_amount))
+		upload_url = path
+	case "amongus_emoji":
+		path = lib.AmongUsAndEmoji(int(path_amount))
+		upload_url = path
+	case "emoji":
+		path = lib.RandomEmoji(int(path_amount))
+		upload_url = path
+	case "invisible":
+		path = lib.InvisibleUrl(15)
+		upload_url = path
+	case "custom":
+		path = path_value() + lib.InvisibleUrl(15)
+		upload_url = path
+	default:
+		path = generated_uuid
+		upload_url = path
 	}
-	file_url := "cdn.floppa.host/files/" +  objectName
-	upload_url = domain + "/i/" + upload_url
+	file_url := fmt.Sprintf("%s/files/%s", os.Getenv("BUCKET_ENDPOINT"), objectName)
+	upload_url = fmt.Sprintf("%s/i/%s", domain, path)
 
 	endTime := time.Since(startTime)
 	embedFields := lib.EmbedPlaceholders(title(), description(), name(), author(), apikey, fileSize, fileName, endTime)
-	err = database.Upload(embedFields.Author, embedFields.Name, embedFields.Description, embedFields.Title, enabled, path, userClaims.Uid, info.Key, color, generated_uuid, fileName, file_url, upload_url, apikey)
+
+	err = database.Upload(embedFields.Author, embedFields.Name, embedFields.Description, embedFields.Title, enabled, userClaims.Uid, color, fileName, file_url, upload_url, path, objectName, apikey)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something wrong happened"})
 	}

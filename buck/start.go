@@ -12,13 +12,15 @@ import (
 var Bucket *minio.Client
 
 func Start() {
-	endpoint := os.Getenv("MINIO_ENDPOINT")
-	accessKeyID := os.Getenv("MINION_ACCESS_KEY_ID")
-	secretAccessKey := os.Getenv("MINION_SECRET_ACCESS_KEY")
-	useSSL, _ := strconv.ParseBool(os.Getenv("MINIO_SSL"))
+	endpoint := os.Getenv("BUCKET_ENDPOINT")
+	accessKeyID := os.Getenv("BUCKET_ACCESS_KEY_ID")
+	secretAccessKey := os.Getenv("BUCKET_SECRET_ACCESS_KEY")
+	region := os.Getenv("BUCKET_REGION")
+	useSSL, _ := strconv.ParseBool(os.Getenv("BUCKET_SSL"))
 
 	var err error
 	Bucket, err = minio.New(endpoint, &minio.Options{
+		Region: region,
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: useSSL,
 	})

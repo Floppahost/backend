@@ -7,7 +7,7 @@ import (
 func Routes(router fiber.Router) {
 	group := router.Group("/")
 
-	group.Post("/upload", Upload)
+	group.Put("/", Upload)
 	group.Get("/render/:id", Render)
-
+	group.Delete("/:file", DeleteFile)
 }
