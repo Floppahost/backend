@@ -21,6 +21,9 @@ func Errors(err error) (int, string) {
 		return 404, errString
 	case "invalid upload":
 		return 404, errString
+	case "invalid domain":
+		return 404, "this domain doesn't exist"
 	}
+
 	return 500, errString
 }

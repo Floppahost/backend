@@ -11,6 +11,7 @@ import (
 	"github.com/floppahost/backend/jwt"
 	"github.com/floppahost/backend/model"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func VerifyUser(token string) model.UserValidation {
@@ -62,7 +63,7 @@ func Register(username string, password string, email string, inviteCode string)
 	invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY"))
 
 	if invite {
-		db.Model(&model.Invites{}).Where("code = ? AND used_by IS NULL AND used_by_id IS NULL", inviteCode).Find(&result)
+		db.Model(&model.Invites{}).Where("code = ? AND used_by_id IS NULL", inviteCode).Find(&result)
 		// verify if the invite is valid
 		if len(result) == 0 {
 			return errors.New("invalid invite")
@@ -89,7 +90,7 @@ func Register(username string, password string, email string, inviteCode string)
 
 	// verify if we created the user
 	if create.Error != nil {
-		return errors.New("an error occurred. Please contact an admin")
+		return errors.New("email or password already exists")
 	}
 
 	// update the invite row
@@ -208,9 +209,10 @@ func Upload(author string, name string, description string, title string, enable
 
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return errors.New("unauthorized")
 	}
+
 	upload := model.Uploads{Path: path, EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Color: color, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url, UploadID: upload_id}
 	query := db.Create(&upload)
 
@@ -234,7 +236,7 @@ func GetEmbed(token string) (map[string]any, error) {
 	db := DB
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return nil, errors.New("invalid token")
 	}
 
@@ -248,11 +250,11 @@ func GetEmbed(token string) (map[string]any, error) {
 	return result, nil
 }
 
-func UpdateEmbed(token string, author string, description string, title string, name string) error {
+func UpdateEmbed(token string, author string, description string, title string, name string, color string) error {
 	db := DB
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return errors.New("unauthorized")
 	}
 
@@ -266,7 +268,7 @@ func UpdateDomain(token string, domain string) error {
 	db := DB
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return errors.New("unauthorized")
 	}
 
@@ -294,7 +296,7 @@ func GetDomains(token string) ([]map[string]any, error) {
 	db := DB
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return nil, errors.New("unauthorized")
 	}
 
@@ -336,7 +338,7 @@ func GetUploads(token string, page int) ([]map[string]any, float64, error) {
 	db := DB
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return nil, 0, errors.New("unauthorized")
 	}
 
@@ -357,7 +359,7 @@ func GetUploadCounter(token string) (int, error) {
 	db := DB
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return 0, errors.New("unauthorized")
 	}
 
@@ -371,7 +373,7 @@ func ChangePathValue(token string, value string) error {
 
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return errors.New("unauthorized")
 	}
 
@@ -389,7 +391,7 @@ func ChangePathMode(token string, mode string, amount int) error {
 
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return errors.New("unauthorized")
 	}
 
@@ -414,11 +416,16 @@ func DeleteUpload(token string, upload string) (model.UserValidation, error) {
 
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return userClaims, errors.New("unauthorized")
 	}
 
-	query := db.Where("user_id = ? AND upload_id = ?", userClaims.Uid, upload).Delete(&model.Uploads{})
+	var query *gorm.DB
+	if userClaims.Admin {
+		query = db.Where("upload_id = ?", upload).Delete(&model.Uploads{})
+	} else {
+		query = db.Where("user_id = ? AND upload_id = ?", userClaims.Uid, upload).Delete(&model.Uploads{})
+	}
 
 	if query.Error != nil {
 		return userClaims, errors.New("invalid upload")
@@ -431,13 +438,17 @@ func ValidateUpload(token string, upload string) (model.UserValidation, error) {
 
 	userClaims := VerifyUser(token)
 
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return userClaims, errors.New("unauthorized")
 	}
 
 	result := map[string]any{}
-	db.Model(&model.Uploads{}).Where("user_id = ? AND upload_id = ?", userClaims.Uid, upload).Scan(&result)
 
+	if userClaims.Admin {
+		db.Model(&model.Uploads{}).Where("upload_id = ?", upload).Scan(&result)
+	} else {
+		db.Model(&model.Uploads{}).Where("user_id = ? AND upload_id = ?", userClaims.Uid, upload).Scan(&result)
+	}
 	if len(result) <= 0 {
 		return userClaims, errors.New("invalid upload")
 	}

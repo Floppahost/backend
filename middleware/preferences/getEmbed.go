@@ -1,9 +1,8 @@
 package preferences
 
 import (
-	"fmt"
-
 	"github.com/floppahost/backend/database"
+	"github.com/floppahost/backend/handler"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,10 +14,8 @@ func GetEmbed(c *fiber.Ctx) error {
 	embed, err := database.GetEmbed(token)
 
 	if err != nil {
-		if fmt.Sprintf("%v", err) == "unauthorized" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "unauthorized"})
-		}
-		return c.Status(500).JSON(fiber.Map{"error": true, "message": fmt.Sprintf("%s", err)})
+		status, errMsg := handler.Errors(err)
+		return c.Status(status).JSON(fiber.Map{"error": true, "message": errMsg})
 	}
 
 	jsonEmbed, _ := json.Marshal(embed)

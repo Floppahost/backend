@@ -9,7 +9,7 @@ type Users struct {
 	Password  string `gorm:"unique;not null"`
 	ApiKey    string `gorm:"not null;unique"`
 	Token     string `gorm:"not null;unique"`
+	Blacklist string `gorm:"default:null"`
 	InviteBan bool   `gorm:"not null;default:false"`
 	Admin     bool   `gorm:"not null;default:false"`
-	Blacklist string `gorm:"default:null"`
 }

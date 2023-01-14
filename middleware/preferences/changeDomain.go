@@ -1,14 +1,13 @@
 package preferences
 
 import (
-	"fmt"
-
 	"github.com/floppahost/backend/database"
+	"github.com/floppahost/backend/handler"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Request struct {
-	 Domain string  `json:"domain" xml:"domain"`
+	Domain string `json:"domain" xml:"domain"`
 }
 
 func ChangeDomain(c *fiber.Ctx) error {
@@ -22,10 +21,8 @@ func ChangeDomain(c *fiber.Ctx) error {
 	err := database.UpdateDomain(token, parser.Domain)
 
 	if err != nil {
-		if fmt.Sprintf("%v", err) == "unauthorized" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": false, "message": "unauthorized"})
-		}
-		return c.Status(404).JSON(fiber.Map{"error": false, "message": "this domain doesn't exist"})
+		status, errMsg := handler.Errors(err)
+		return c.Status(status).JSON(fiber.Map{"error": true, "message": errMsg})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "success"})
 }
