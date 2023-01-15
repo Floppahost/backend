@@ -28,9 +28,9 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(status).JSON(fiber.Map{"error": true, "message": errString})
 	}
 
-	c.Set("access-control-allow-origin", "floppa.host")
-	c.Set("access-control-allow-credentials", "true")
 	c.Cookie(&fiber.Cookie{
+		Domain:   ".floppa.host",
+		Path:     "/",
 		Name:     "token",
 		Value:    token,
 		Secure:   true,
