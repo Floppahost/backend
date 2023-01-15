@@ -55,7 +55,7 @@ func Login(username string, password string) (string, error) {
 	return fmt.Sprintf("%s", result["token"]), nil
 }
 
-func Register(username string, password string, email string, inviteCode string) error {
+func Register(username string, password string, email string, inviteCode string) (string, error) {
 	db := DB
 
 	result := map[string]any{}
@@ -66,14 +66,14 @@ func Register(username string, password string, email string, inviteCode string)
 		db.Model(&model.Invites{}).Where("code = ? AND used_by_id IS NULL", inviteCode).Find(&result)
 		// verify if the invite is valid
 		if len(result) == 0 {
-			return errors.New("invalid invite")
+			return "", errors.New("invalid invite")
 		}
 	}
 
 	// hash the password and verify the status
 	hashedPassword, err := argonpass.Hash(password, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// declare our user model and do the create operation
@@ -81,7 +81,7 @@ func Register(username string, password string, email string, inviteCode string)
 	token, err := jwt.GenerateUserToken("system", username)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	user := model.Users{Username: username, Email: email, Password: hashedPassword, ApiKey: uuid.NewString(), Token: token}
@@ -90,7 +90,7 @@ func Register(username string, password string, email string, inviteCode string)
 
 	// verify if we created the user
 	if create.Error != nil {
-		return errors.New("email or password already exists")
+		return "", errors.New("email or username already exists")
 	}
 
 	// update the invite row
@@ -100,7 +100,7 @@ func Register(username string, password string, email string, inviteCode string)
 
 	embed := model.Embeds{UserID: int(user.ID)}
 	db.Create(&embed)
-	return nil
+	return token, nil
 }
 
 func GetProfile(user string) (string, error) {

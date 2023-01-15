@@ -20,5 +20,5 @@ func GetInviteStatus(c *fiber.Ctx) error {
 	if err != nil {
 		panic("invalid invite only value; must be a bool")
 	}
-	return c.Status(400).JSON(fiber.Map{"error": false, "message": "success", "inviteOnly": inviteBool})
+	return c.Status(200).JSON(fiber.Map{"error": false, "message": "success", "inviteOnly": inviteBool})
 }

@@ -2,7 +2,6 @@ package auth
 
 import (
 	// externos
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -30,12 +29,11 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(status).JSON(fiber.Map{"error": true, "message": errString})
 	}
 
-	fmt.Println(token)
 	cookie := new(fiber.Cookie)
 	cookie.Name = "token"
 	cookie.Value = token
 
 	c.Cookie(cookie)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Logged in."})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "logged in."})
 
 }

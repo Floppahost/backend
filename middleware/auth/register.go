@@ -1,9 +1,8 @@
 package auth
 
 import (
-	"fmt"
-
 	"github.com/floppahost/backend/database"
+	"github.com/floppahost/backend/handler"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -22,11 +21,16 @@ func Register(c *fiber.Ctx) error {
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-	err := database.Register(parser.Username, parser.Password, parser.Email, parser.Invite)
+	token, err := database.Register(parser.Username, parser.Password, parser.Email, parser.Invite)
 
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": fmt.Sprintf("%s", err)})
+		status, errString := handler.Errors(err)
+		return c.Status(status).JSON(fiber.Map{"error": true, "message": errString})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "User registered"})
+	cookie := new(fiber.Cookie)
+	cookie.Name = "token"
+	cookie.Value = token
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "user registered"})
 }
