@@ -28,9 +28,13 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(status).JSON(fiber.Map{"error": true, "message": errString})
 	}
 
-	cookie := new(fiber.Cookie)
-	cookie.Name = "token"
-	cookie.Value = token
+	c.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    token,
+		Secure:   true,
+		HTTPOnly: true,
+		SameSite: "none",
+	})
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "user registered"})
 }
