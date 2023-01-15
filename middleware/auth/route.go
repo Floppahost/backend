@@ -8,7 +8,7 @@ import (
 func Routes(router fiber.Router) {
 	group := router.Group("/")
 
-	group.Post("/status", Status)
+	group.Get("/status", Status)
 	group.Post("/login", Login)
 	group.Post("/register", Register)
 
