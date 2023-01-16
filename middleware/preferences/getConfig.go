@@ -2,11 +2,9 @@ package preferences
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/floppahost/backend/database"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 func GetConfig(c *fiber.Ctx) error {
@@ -34,12 +32,5 @@ func GetConfig(c *fiber.Ctx) error {
 		"ErrorMessage": "{json:error}"
 	  }`, userClaims.ApiKey)
 
-	random_uuid := uuid.NewString()
-	os.WriteFile(os.Getenv("FILE_PATH")+random_uuid, []byte(config), 0644)
-	c.Download(os.Getenv("FILE_PATH")+random_uuid, "floppa-host-config.sxcu")
-	err := os.Remove(os.Getenv("FILE_PATH") + random_uuid)
-	if err != nil {
-		panic("PANIC! couldn't remove temporary config")
-	}
-	return c.Status(400).JSON(fiber.Map{"error": false, "message": "Success"})
+	return c.Status(200).JSON(fiber.Map{"error": false, "message": "success", "config": config})
 }
