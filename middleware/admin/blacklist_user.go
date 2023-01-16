@@ -8,16 +8,16 @@ import (
 
 type Req struct {
 	Username string `json:"username" xml:"username"`
-	Reason string `json:"reason" xml:"reason"`
+	Reason   string `json:"reason" xml:"reason"`
 }
 
 func BlacklistUser(c *fiber.Ctx) error {
-	headers := c.GetReqHeaders()
+	token := c.Cookies("token")
 	parser := new(Req)
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-	err := database.BlacklistUser(headers["Authorization"],parser.Username, parser.Reason)
+	err := database.BlacklistUser(token, parser.Username, parser.Reason)
 
 	if err != nil {
 		status, errString := handler.Errors(err)

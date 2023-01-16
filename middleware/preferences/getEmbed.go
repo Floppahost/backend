@@ -8,8 +8,7 @@ import (
 )
 
 func GetEmbed(c *fiber.Ctx) error {
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 
 	embed, err := database.GetEmbed(token)
 

@@ -10,11 +10,11 @@ import (
 )
 
 func InviteWave(c *fiber.Ctx) error {
-	headers := c.GetReqHeaders()
+	token := c.Cookies("token")
 	if invite, _ := strconv.ParseBool(os.Getenv("INVITE_ONLY")); !invite {
 		return c.Status(fiber.StatusNotImplemented).JSON(fiber.Map{"error": true, "message": "Invite system isn't enabled"})
 	}
-	err := database.InviteWave(headers["Authorization"])
+	err := database.InviteWave(token)
 
 	if err != nil {
 		status, errString := handler.Errors(err)

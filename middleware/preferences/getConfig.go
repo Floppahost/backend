@@ -11,11 +11,10 @@ import (
 
 func GetConfig(c *fiber.Ctx) error {
 
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 
 	userClaims := database.VerifyUser(token)
-	if !userClaims.ValidUser {
+	if !userClaims.ValidUser || userClaims.Blacklisted {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": true, "message": "you don't have permission to perform this action"})
 	}
 
@@ -37,6 +36,10 @@ func GetConfig(c *fiber.Ctx) error {
 
 	random_uuid := uuid.NewString()
 	os.WriteFile(os.Getenv("FILE_PATH")+random_uuid, []byte(config), 0644)
-	c.Download(os.Getenv("FILE_PATH")+random_uuid, "config.sxcu")
+	c.Download(os.Getenv("FILE_PATH")+random_uuid, "floppa-host-config.sxcu")
+	err := os.Remove(os.Getenv("FILE_PATH") + random_uuid)
+	if err != nil {
+		panic("PANIC! couldn't remove temporary config")
+	}
 	return c.Status(400).JSON(fiber.Map{"error": false, "message": "Success"})
 }

@@ -17,8 +17,7 @@ func ChangePassword(c *fiber.Ctx) error {
 		return err
 	}
 
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 
 	err := database.ChangePassword(token, parser.OldPasword, parser.NewPassword)
 

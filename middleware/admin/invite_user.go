@@ -22,8 +22,8 @@ func GenerateInvite(c *fiber.Ctx) error {
 		return err
 	}
 
-	headers := c.GetReqHeaders()
-	err := database.GenerateInvite(headers["Authorization"], parser.Username)
+	token := c.Cookies("token")
+	err := database.GenerateInvite(token, parser.Username)
 
 	if err != nil {
 		status, errString := handler.Errors(err)

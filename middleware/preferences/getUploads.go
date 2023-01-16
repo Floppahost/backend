@@ -17,8 +17,7 @@ func GetUploads(c *fiber.Ctx) error {
 		return err
 	}
 
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 
 	uploads, maxPages, err := database.GetUploads(token, parser.Page)
 

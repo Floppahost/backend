@@ -16,8 +16,7 @@ func ChangeDomain(c *fiber.Ctx) error {
 		return err
 	}
 
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 	err := database.UpdateDomain(token, parser.Domain)
 
 	if err != nil {

@@ -13,5 +13,5 @@ func Status(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": "not authorized", "auth": false})
 	}
 
-	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{"error": false, "message": "Authenticated", "auth": true})
+	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{"error": false, "message": "authenticated", "auth": true})
 }

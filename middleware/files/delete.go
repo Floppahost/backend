@@ -11,8 +11,7 @@ import (
 )
 
 func DeleteFile(c *fiber.Ctx) error {
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 	file := c.Params("file")
 
 	_, err := database.ValidateUpload(token, file)

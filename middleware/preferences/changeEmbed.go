@@ -20,8 +20,7 @@ func ChangeEmbed(c *fiber.Ctx) error {
 		return err
 	}
 
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 
 	err := database.UpdateEmbed(token, parser.Author, parser.Description, parser.Title, parser.Name, parser.Color)
 

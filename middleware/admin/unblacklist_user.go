@@ -6,19 +6,18 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-
 func UnblacklistUser(c *fiber.Ctx) error {
 	type req struct {
 		Username string `json:"username" xml:"username"`
-		Reason string `json:"reason" xml:"reason"`
-	}	
-	
-	headers := c.GetReqHeaders()
+		Reason   string `json:"reason" xml:"reason"`
+	}
+
+	token := c.Cookies("token")
 	parser := new(req)
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-	err := database.UnblacklistUser(headers["Authorization"],parser.Username, parser.Reason)
+	err := database.UnblacklistUser(token, parser.Username, parser.Reason)
 
 	if err != nil {
 		status, errString := handler.Errors(err)

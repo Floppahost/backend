@@ -8,8 +8,7 @@ import (
 
 func GetDomains(c *fiber.Ctx) error {
 
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
 
 	domains, err := database.GetDomains(token)
 

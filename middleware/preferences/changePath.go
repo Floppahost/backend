@@ -10,9 +10,9 @@ import (
 )
 
 type Reques struct {
-	Path	string `json:"path" xml:"path"`
-	Mode 	string `json:"mode" xml:"mode"`
-	Amount	int `json:"amount" xml:"amount"`
+	Path   string `json:"path" xml:"path"`
+	Mode   string `json:"mode" xml:"mode"`
+	Amount int    `json:"amount" xml:"amount"`
 }
 
 func ChangePath(c *fiber.Ctx) error {
@@ -21,8 +21,8 @@ func ChangePath(c *fiber.Ctx) error {
 		return err
 	}
 
-	headers := c.GetReqHeaders()
-	token := headers["Authorization"]
+	token := c.Cookies("token")
+
 	err := validate(parser)
 
 	if err != nil {
@@ -47,14 +47,14 @@ func ChangePath(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": fmt.Sprintf("%v", err)})
 	}
-	
+
 	return c.Status(200).JSON(fiber.Map{"error": false, "message": "success"})
 }
 
-func validate (parser *Reques) error {
+func validate(parser *Reques) error {
 	mode := parser.Mode
 	err := validateMode(mode, parser.Path, parser.Amount)
-	
+
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func validateMode(mode string, path string, amount int) error {
 }
 
 func validatePath(path string) error {
-	if strings.Contains(path, "/") ||  strings.Contains(path, "\\"){
+	if strings.Contains(path, "/") || strings.Contains(path, "\\") {
 		return errors.New("the path can not contain any kind of slashes")
 	}
 
