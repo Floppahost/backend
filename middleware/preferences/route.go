@@ -22,5 +22,7 @@ func Routes(router fiber.Router) {
 
 	get.Get("/config", GetConfig)
 
+	get.Get("/invites", GetInvites)
+
 	change.Post("/path", ChangePath)
 }

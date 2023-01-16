@@ -455,3 +455,16 @@ func ValidateUpload(token string, upload string) (model.UserValidation, error) {
 
 	return userClaims, nil
 }
+
+func GetInvites(token string) ([]map[string]any, error) {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser || userClaims.Blacklisted {
+		return nil, errors.New("unauthorized")
+	}
+
+	result := []map[string]any{}
+	db.Raw("SELECT code, username FROM invites INNER JOIN users ON invites.used_by_id = users.id").Find(&result)
+	return result, nil
+}
