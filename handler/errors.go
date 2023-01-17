@@ -33,7 +33,8 @@ func Errors(err error) (int, string) {
 		return 404, "this domain doesn't exist"
 	case "invalid invite":
 		return 404, errString
-
+	case "the user doesn't exist":
+		return 404, errString
 	}
 
 	return 500, errString

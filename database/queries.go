@@ -481,7 +481,7 @@ func AddDomain(token string, domain string, wildcard bool, username string) erro
 	db.Model(&model.Users{}).Select("id").Where("username = ?", username).Find(&result)
 
 	if len(result) <= 0 {
-		return errors.New("The user doesn't exist")
+		return errors.New("the user doesn't exist")
 	}
 
 	uid, _ := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
