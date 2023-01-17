@@ -8,6 +8,12 @@ func Errors(err error) (int, string) {
 	errString := fmt.Sprintf("%v", err)
 	switch errString {
 
+	// ---------------- 400 ----------------
+	case "email or username already exists":
+		return 400, errString
+	case "invalid old password":
+		return 400, errString
+
 	// ---------------- 401 ----------------
 	case "unauthorized":
 		return 401, UnauthorizedErr
@@ -27,8 +33,7 @@ func Errors(err error) (int, string) {
 		return 404, "this domain doesn't exist"
 	case "invalid invite":
 		return 404, errString
-	case "email or username already exists":
-		return 400, errString
+
 	}
 
 	return 500, errString
