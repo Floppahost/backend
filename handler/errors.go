@@ -13,6 +13,8 @@ func Errors(err error) (int, string) {
 		return 400, errString
 	case "invalid old password":
 		return 400, errString
+	case "this domain already exists":
+		return 400, errString
 
 	// ---------------- 401 ----------------
 	case "unauthorized":

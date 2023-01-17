@@ -488,7 +488,7 @@ func AddDomain(token string, domain string, wildcard bool, username string) erro
 	newDomain := model.Domains{Domain: domain, Wildcard: wildcard, ByUID: int(uid)}
 	query := db.Create(&newDomain)
 	if query.Error != nil {
-		return errors.New("something unexpected happened; please contact an admin")
+		return errors.New("this domain already exists")
 	}
 	return nil
 }
