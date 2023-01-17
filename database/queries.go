@@ -492,7 +492,7 @@ func PurgeInvites(token string) error {
 	if !userClaims.ValidUser || userClaims.Blacklisted || !userClaims.Admin {
 		return errors.New("unauthorized")
 	}
-	query := db.Raw("DELETE from invites WHERE used_by_id IS NULL")
+	query := db.Raw("DELETE FROM invites WHERE used_by_id IS NULL")
 
 	if query.Error != nil {
 		return errors.New("something unexpected happened; please contact an admin")
