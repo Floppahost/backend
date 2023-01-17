@@ -133,7 +133,7 @@ func InviteWave(jwt string) error {
 	db.Raw("INSERT INTO invites (user_id) (SELECT id FROM users)").Scan(&result)
 
 	if result != nil {
-		return errors.New("something unexpected happened")
+		return errors.New("something unexpected happened; please contact an admin")
 	}
 	return nil
 }
@@ -155,14 +155,14 @@ func GenerateInvite(jwt string, username string) error {
 
 	id, err := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
 	if err != nil {
-		return errors.New("something weird happened")
+		return errors.New("something unexpected happened; please contact an admin")
 	}
 
 	invite := model.Invites{UserID: int(id)}
 	create := db.Create(&invite)
 
 	if create.Error != nil {
-		return errors.New("something weird happened")
+		return errors.New("something unexpected happened; please contact an admin")
 	}
 
 	return nil
@@ -217,7 +217,7 @@ func Upload(author string, name string, description string, title string, enable
 	query := db.Create(&upload)
 
 	if query.Error != nil {
-		return errors.New("something wrong happened")
+		return errors.New("something unexpected happened; please contact an admin")
 	}
 	return nil
 }
@@ -467,4 +467,36 @@ func GetInvites(token string) ([]map[string]any, error) {
 	result := []map[string]any{}
 	db.Raw("SELECT code, username FROM invites INNER JOIN users ON invites.used_by_id = users.id").Find(&result)
 	return result, nil
+}
+
+func AddDomain(token string, domain string, wildcard bool, uid int) error {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser || userClaims.Blacklisted || !userClaims.Admin {
+		return errors.New("unauthorized")
+	}
+
+	newDomain := model.Domains{Domain: domain, Wildcard: wildcard, ByUID: uid}
+	query := db.Create(&newDomain)
+	if query.Error != nil {
+		return errors.New("something unexpected happened; please contact an admin")
+	}
+	return nil
+}
+
+func PurgeInvites(token string) error {
+	db := DB
+	userClaims := VerifyUser(token)
+
+	if !userClaims.ValidUser || userClaims.Blacklisted || !userClaims.Admin {
+		return errors.New("unauthorized")
+	}
+	query := db.Raw("DELETE from invites WHERE used_by_id IS NULL")
+
+	if query.Error != nil {
+		return errors.New("something unexpected happened; please contact an admin")
+	}
+
+	return nil
 }
