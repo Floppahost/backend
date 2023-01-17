@@ -6,7 +6,7 @@ import (
 
 type Domains struct {
 	gorm.Model
-	Domain 		string
-	Wildcard    bool
-	ByUID		int
+	Domain   string `gorm:"unique;not null"`
+	Wildcard bool
+	ByUID    int `gorm:"unique;not null"`
 }
