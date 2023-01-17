@@ -469,7 +469,7 @@ func GetInvites(token string) ([]map[string]any, error) {
 	return result, nil
 }
 
-func AddDomain(token string, domain string, wildcard bool, uid int) error {
+func AddDomain(token string, domain string, wildcard bool, username string) error {
 	db := DB
 	userClaims := VerifyUser(token)
 
@@ -477,7 +477,15 @@ func AddDomain(token string, domain string, wildcard bool, uid int) error {
 		return errors.New("unauthorized")
 	}
 
-	newDomain := model.Domains{Domain: domain, Wildcard: wildcard, ByUID: uid}
+	result := map[string]any{}
+	db.Model(&model.Users{}).Select("id").Where("username = ?", username).Find(&result)
+
+	if len(result) <= 0 {
+		return errors.New("The user doesn't exist")
+	}
+
+	uid, _ := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
+	newDomain := model.Domains{Domain: domain, Wildcard: wildcard, ByUID: int(uid)}
 	query := db.Create(&newDomain)
 	if query.Error != nil {
 		return errors.New("something unexpected happened; please contact an admin")
