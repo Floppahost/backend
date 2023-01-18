@@ -20,8 +20,8 @@ func GetConfig(c *fiber.Ctx) error {
 		"Version": "14.0.0",
 		"Name": "floppa.host",
 		"DestinationType": "ImageUploader, FileUploader",
-		"RequestMethod": "POST",
-		"RequestURL": "https://api.floppa.host/files/upload",
+		"RequestMethod": "PUT",
+		"RequestURL": "https://api.floppa.host/files",
 		"Headers": {
 		  "Authorization": "%s",
 		},

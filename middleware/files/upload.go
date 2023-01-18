@@ -170,5 +170,5 @@ func Upload(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something wrong happened"})
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success", "url": upload_url, "file_url": file_url})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "message": "Success", "url": fmt.Sprintf("https://%v", upload_url), "file_url": fmt.Sprintf("https://%v", file_url)})
 }
