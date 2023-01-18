@@ -35,5 +35,5 @@ func DeleteFile(c *fiber.Ctx) error {
 		status, err := handler.Errors(err)
 		return c.Status(status).JSON(fiber.Map{"error": true, "message": err})
 	}
-	return c.SendString(file)
+	return c.Status(200).JSON(fiber.Map{"error": false, "message": "sucess"})
 }
