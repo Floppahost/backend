@@ -39,7 +39,7 @@ func Upload(c *fiber.Ctx) error {
 	filePath := fmt.Sprintf("./%s", fsPath)
 	c.SaveFile(file, filePath)
 	fileName := file.Filename
-	fileHeader := fmt.Sprintf("%v", file.Header)
+	fileHeader := fmt.Sprintf("%v", file.Header["Content-Type"])
 
 	fileNameSplit := strings.Split(fileName, ".")
 	fileExtension := ""
