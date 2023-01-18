@@ -3,6 +3,7 @@ package files
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -164,7 +165,8 @@ func Upload(c *fiber.Ctx) error {
 	endTime := time.Since(startTime)
 	embedFields := lib.EmbedPlaceholders(site_name(), site_name_url(), title(), description(), author(), author_url(), apikey, fileSize, fileName, endTime)
 
-	err = database.Upload(embedFields.SiteName, embedFields.SiteNameUrl, embedFields.Title, embedFields.Description, embedFields.Author, embedFields.AuthorUrl, color, userClaims.Uid, fileName, file_url, upload_url, path, objectName, apikey, fileHeader)
+	urlEscape := url.QueryEscape(path)
+	err = database.Upload(embedFields.SiteName, embedFields.SiteNameUrl, embedFields.Title, embedFields.Description, embedFields.Author, embedFields.AuthorUrl, color, userClaims.Uid, fileName, file_url, upload_url, urlEscape, objectName, apikey, fileHeader)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something wrong happened"})
 	}

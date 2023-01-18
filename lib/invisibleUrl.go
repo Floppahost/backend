@@ -18,7 +18,7 @@ func InvisibleUrl(size int) string {
 		rand.Seed(time.Now().UnixNano() * (int64(i) + 1))
 		integer := rand.Intn(3)
 		char := chars[integer]
-		str = str + html.UnescapeString("&#" + strconv.Itoa(char) + ";")
+		str = str + html.UnescapeString("&#"+strconv.Itoa(char)+";")
 	}
 	return str
 }

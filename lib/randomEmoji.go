@@ -16,14 +16,14 @@ func RandomEmoji(size int) string {
 		{128513, 128591},
 		{128640, 128704},
 	}
-	var str string 
+	var str string
 	for i := 0; i < size; i++ {
-		rand.Seed(time.Now().UnixNano() * (int64(i)+1))
+		rand.Seed(time.Now().UnixNano() * (int64(i) + 1))
 		r := emoji[rand.Int()%len(emoji)]
 		min := r[0]
 		max := r[1]
 		n := rand.Intn(max-min+1) + min
-		str = str + html.UnescapeString("&#" + strconv.Itoa(n) + ";") + InvisibleUrl(int(math.Round(float64(16/size))))
+		str = str + html.UnescapeString("&#"+strconv.Itoa(n)+";") + InvisibleUrl(int(math.Round(float64(16/size))))
 	}
 	return str
 }
