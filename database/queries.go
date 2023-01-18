@@ -346,6 +346,8 @@ func GetUploads(token string, page int) ([]map[string]any, float64, error) {
 	// limit := page * 10
 
 	all := []map[string]any{}
+
+	// I CANT USE THE ID LIKE THAT
 	// SELECT * FROM uploads WHERE user_id = n ORDER BY id LIMIT limit;
 	// db.Model(&model.Uploads{}).Select("id, upload_url, file_url, file_name, upload_id, upload_url").Where("user_id = ? AND id <= ? AND id >= ?", userClaims.Uid, limit, limit-10).Order("id desc").Limit(limit).Scan(&result)
 	db.Model(&model.Uploads{}).Select("id, upload_url, file_url, file_name, upload_id, upload_url").Where("user_id = ?", userClaims.Uid).Scan(&result)
