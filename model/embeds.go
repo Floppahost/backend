@@ -8,7 +8,7 @@ type Embeds struct {
 	gorm.Model
 	UserID      int    `gorm:"unique;primarykey"`
 	SiteName    string `gorm:"default:Floppa!"`
-	SiteNameUrl string `gorm:"default:https>//floppa.host"`
+	SiteNameUrl string `gorm:"default:https://floppa.host"`
 	Title       string `gorm:"default:I am using Floppa.host!"`
 	Description string `gorm:"default:Floppa.host is good!"`
 	Author      string `gorm:"default:Floppa"`
