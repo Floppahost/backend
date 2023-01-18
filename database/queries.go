@@ -225,7 +225,7 @@ func Upload(site_name string, site_name_url string, title string, description st
 func GetUpload(uploadId string) (map[string]any, error) {
 	db := DB
 	result := map[string]any{}
-	db.Raw("SELECT mime_type, file_url, created_at, color, upload_id, user_id, title, site_name, site_name_url, description, author, author_url, file_name, username FROM uploads WHERE upload_id = ? INNER JOIN users ON domains.user_id = users.id", uploadId).Find(&result)
+	db.Raw("SELECT mime_type, file_url, created_at, color, upload_id, user_id, title, site_name, site_name_url, description, author, author_url, file_name, username FROM uploads INNER JOIN users ON uploads.user_id = users.id WHERE upload_id = ?", uploadId).Find(&result)
 	if len(result) <= 0 {
 		return nil, errors.New("the upload doesn't exist")
 	}
