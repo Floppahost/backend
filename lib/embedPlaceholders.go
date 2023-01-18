@@ -9,7 +9,7 @@ import (
 	"github.com/floppahost/backend/model"
 )
 
-func EmbedPlaceholders(title string, description string, name string, author string, token string, fileSize int64, fileName string, delay time.Duration) model.EmbedStruct {
+func EmbedPlaceholders(site_name string, site_name_url string, title string, description string, author string, author_url string, token string, fileSize int64, fileName string, delay time.Duration) model.EmbedStruct {
 	var placeholders [6]string
 
 	placeholders[0] = "$user$"
@@ -20,13 +20,13 @@ func EmbedPlaceholders(title string, description string, name string, author str
 	placeholders[5] = "$uid$"
 	uploadCounter, _ := database.GetUploadCounter(token)
 	userClaims := database.VerifyUser(token)
-	
+
 	var values [6]any
 	values[0] = userClaims.Username
-	values[1] = uploadCounter+1 // plus one counting this upload
+	values[1] = uploadCounter + 1 // plus one counting this upload
 	values[2] = delay
 	values[3] = fileSize
-	values[4] = fileName 
+	values[4] = fileName
 	values[5] = userClaims.Uid
 
 	substituteValue := func(str string) string {
@@ -39,12 +39,9 @@ func EmbedPlaceholders(title string, description string, name string, author str
 		return newStr
 	}
 
-	substituteValue("e")
-	
-
-	newTitle := substituteValue(title)
-	newDescription := substituteValue(description)
-	newName := substituteValue(name)
-	newAuthor := substituteValue(author)
-	return model.EmbedStruct{Title: newTitle, Description: newDescription, Name: newName, Author: newAuthor}
+	new_site_name := substituteValue(site_name)
+	new_title := substituteValue(title)
+	new_description := substituteValue(description)
+	new_author := substituteValue(author)
+	return model.EmbedStruct{Title: new_title, Description: new_description, Author: new_author, SiteName: new_site_name, SiteNameUrl: site_name_url, AuthorUrl: author_url}
 }

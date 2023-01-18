@@ -70,6 +70,15 @@ func Upload(c *fiber.Ctx) error {
 		}
 		return b
 	}
+
+	author_url := func() string {
+		b := fmt.Sprintf("%v", embed["author_url"])
+		if embed["author_url"] == nil {
+			b = ""
+		}
+		return b
+	}
+
 	description := func() string {
 		b := fmt.Sprintf("%v", embed["description"])
 		if embed["description"] == nil {
@@ -77,13 +86,22 @@ func Upload(c *fiber.Ctx) error {
 		}
 		return b
 	}
-	name := func() string {
-		b := fmt.Sprintf("%v", embed["name"])
-		if embed["name"] == nil {
+	site_name := func() string {
+		b := fmt.Sprintf("%v", embed["site_name"])
+		if embed["site_name"] == nil {
 			b = ""
 		}
 		return b
 	}
+
+	site_name_url := func() string {
+		b := fmt.Sprintf("%v", embed["site_name_url"])
+		if embed["site_name_url"] == nil {
+			b = ""
+		}
+		return b
+	}
+
 	title := func() string {
 		b := fmt.Sprintf("%v", embed["title"])
 		if embed["title"] == nil {
@@ -92,8 +110,8 @@ func Upload(c *fiber.Ctx) error {
 		return b
 	}
 	embedColor := func() string {
-		b := fmt.Sprintf("%v", embed["title"])
-		if embed["title"] == nil {
+		b := fmt.Sprintf("%v", embed["color"])
+		if embed["color"] == nil {
 			b = ""
 		}
 		return b
@@ -108,8 +126,6 @@ func Upload(c *fiber.Ctx) error {
 		}
 		return b
 	}
-	enabled, _ := strconv.ParseBool(fmt.Sprintf("%v", embed["enabled"]))
-
 	color := embedColor()
 
 	if color == "random" {
@@ -146,9 +162,9 @@ func Upload(c *fiber.Ctx) error {
 	upload_url = fmt.Sprintf("%s/i/%s", domain, path)
 
 	endTime := time.Since(startTime)
-	embedFields := lib.EmbedPlaceholders(title(), description(), name(), author(), apikey, fileSize, fileName, endTime)
+	embedFields := lib.EmbedPlaceholders(site_name(), site_name_url(), title(), description(), author(), author_url(), apikey, fileSize, fileName, endTime)
 
-	err = database.Upload(embedFields.Author, embedFields.Name, embedFields.Description, embedFields.Title, enabled, userClaims.Uid, color, fileName, file_url, upload_url, path, objectName, apikey)
+	err = database.Upload(embedFields.SiteName, embedFields.SiteNameUrl, embedFields.Title, embedFields.Description, embedFields.Author, embedFields.AuthorUrl, color, userClaims.Uid, fileName, file_url, upload_url, path, objectName, apikey, fileHeader)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something wrong happened"})
 	}

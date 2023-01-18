@@ -10,4 +10,5 @@ func Routes(router fiber.Router) {
 	group.Put("/", Upload)
 	group.Get("/render/:id", Render)
 	group.Delete("/:file", DeleteFile)
+	group.Get("/render/embed", Render)
 }

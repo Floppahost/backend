@@ -7,10 +7,12 @@ import (
 )
 
 type Req struct {
-	Author      string `json:"author" xml:"author"`
+	SiteName    string `json:"site_name" xml:"site_name"`
+	SiteNameUrl string `json:"site_name_url" xml:"site_name_url"`
 	Title       string `json:"title" xml:"title"`
-	Name        string `json:"name" xml:"name"`
 	Description string `json:"description" xml:"description"`
+	Author      string `json:"author" xml:"author"`
+	AuthorUrl   string `json:"author_url" xml:"author_url"`
 	Color       string `json:"color" xml:"color"`
 }
 
@@ -22,7 +24,7 @@ func ChangeEmbed(c *fiber.Ctx) error {
 
 	token := c.Cookies("token")
 
-	err := database.UpdateEmbed(token, parser.Author, parser.Description, parser.Title, parser.Name, parser.Color)
+	err := database.UpdateEmbed(token, parser.SiteName, parser.SiteName, parser.Title, parser.Description, parser.Author, parser.Author, parser.Color)
 
 	if err != nil {
 		status, errMsg := handler.Errors(err)

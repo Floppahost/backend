@@ -186,7 +186,7 @@ func BlacklistUser(jwt string, username string, reason string) error {
 	return nil
 }
 
-func UnblacklistUser(jwt string, username string, reason string) error {
+func UnblacklistUser(jwt string, username string) error {
 	db := DB
 
 	userClaims := VerifyUser(jwt)
@@ -204,7 +204,7 @@ func UnblacklistUser(jwt string, username string, reason string) error {
 	return nil
 }
 
-func Upload(author string, name string, description string, title string, enabled bool, userid int, color string, fileName string, file_url string, upload_url string, path string, upload_id string, token string) error {
+func Upload(site_name string, site_name_url string, title string, description string, author string, author_url string, color string, userid int, fileName string, file_url string, upload_url string, path string, upload_id string, token string, mime_type string) error {
 	db := DB
 
 	userClaims := VerifyUser(token)
@@ -213,7 +213,7 @@ func Upload(author string, name string, description string, title string, enable
 		return errors.New("unauthorized")
 	}
 
-	upload := model.Uploads{Path: path, EmbedEnabled: enabled, Author: author, Name: name, Description: description, UserID: userid, Color: color, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url, UploadID: upload_id}
+	upload := model.Uploads{Path: path, Author: author, AuthorUrl: author, Title: title, SiteName: site_name, SiteNameUrl: site_name_url, Description: description, Color: color, UserID: userid, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url, UploadID: upload_id}
 	query := db.Create(&upload)
 
 	if query.Error != nil {
@@ -225,7 +225,7 @@ func Upload(author string, name string, description string, title string, enable
 func GetUpload(uploadId string) (map[string]any, error) {
 	db := DB
 	result := map[string]any{}
-	db.Model(&model.Uploads{}).Select("file_url", "created_at", "color", "upload_id", "object", "user_id", "title", "description", "author", "embed_enabled", "file_name").Where("upload_id = ?", uploadId).Find(&result)
+	db.Model(&model.Uploads{}).Select("mime_type", "file_url", "created_at", "color", "upload_id", "user_id", "title", "site_name", "site_name_url", "description", "author", "author_url", "file_name").Where("path = ?", uploadId).Find(&result)
 	if len(result) <= 0 {
 		return nil, errors.New("the upload doesn't exist")
 	}
@@ -237,20 +237,20 @@ func GetEmbed(token string) (map[string]any, error) {
 	userClaims := VerifyUser(token)
 
 	if !userClaims.ValidUser || userClaims.Blacklisted {
-		return nil, errors.New("invalid token")
+		return nil, errors.New("unauthorized")
 	}
 
 	result := map[string]any{}
 	db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Find(&result)
 
 	if len(result) == 0 {
-		return nil, errors.New("invalid authorization token")
+		return nil, errors.New("unauthorized")
 	}
 
 	return result, nil
 }
 
-func UpdateEmbed(token string, author string, description string, title string, name string, color string) error {
+func UpdateEmbed(token string, site_name string, site_name_url string, title string, description string, author string, author_url string, color string) error {
 	db := DB
 	userClaims := VerifyUser(token)
 
@@ -260,7 +260,7 @@ func UpdateEmbed(token string, author string, description string, title string, 
 
 	uid := userClaims.Uid
 
-	db.Model(&model.Embeds{}).Where("user_id = ?", uid).Updates(model.Embeds{Title: title, Author: author, Description: description, Name: name})
+	db.Model(&model.Embeds{}).Where("user_id = ?", uid).Updates(model.Embeds{SiteName: site_name, SiteNameUrl: site_name_url, Title: title, Description: description, Author: author, AuthorUrl: author_url})
 	return nil
 }
 
@@ -480,11 +480,14 @@ func AddDomain(token string, domain string, wildcard bool, username string) erro
 	result := map[string]any{}
 	db.Model(&model.Users{}).Select("id").Where("username = ?", username).Find(&result)
 
-	if len(result) <= 0 {
+	if len(result) == 0 {
 		return errors.New("the user doesn't exist")
 	}
 
-	uid, _ := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
+	uid, err := strconv.ParseInt(fmt.Sprintf("%v", result["id"]), 10, 64)
+	if err != nil {
+		return errors.New("something unexpected happened; please contact an admin")
+	}
 	newDomain := model.Domains{Domain: domain, Wildcard: wildcard, ByUID: int(uid)}
 	query := db.Create(&newDomain)
 	if query.Error != nil {

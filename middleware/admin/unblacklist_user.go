@@ -9,7 +9,6 @@ import (
 func UnblacklistUser(c *fiber.Ctx) error {
 	type req struct {
 		Username string `json:"username" xml:"username"`
-		Reason   string `json:"reason" xml:"reason"`
 	}
 
 	token := c.Cookies("token")
@@ -17,7 +16,7 @@ func UnblacklistUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(parser); err != nil {
 		return err
 	}
-	err := database.UnblacklistUser(token, parser.Username, parser.Reason)
+	err := database.UnblacklistUser(token, parser.Username)
 
 	if err != nil {
 		status, errString := handler.Errors(err)

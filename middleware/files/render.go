@@ -1,6 +1,8 @@
 package files
 
 import (
+	"fmt"
+
 	"github.com/floppahost/backend/database"
 	"github.com/gofiber/fiber/v2"
 )
@@ -8,6 +10,7 @@ import (
 func Render(c *fiber.Ctx) error {
 
 	uploadId := c.Params("id")
+	fmt.Println(uploadId)
 	file, err := database.GetUpload(uploadId)
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": false, "message": "the upload doesn't exist"})
