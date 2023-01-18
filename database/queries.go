@@ -343,11 +343,12 @@ func GetUploads(token string, page int) ([]map[string]any, float64, error) {
 	}
 
 	result := []map[string]any{}
-	limit := page * 10
+	// limit := page * 10
 
 	all := []map[string]any{}
 	// SELECT * FROM uploads WHERE user_id = n ORDER BY id LIMIT limit;
-	db.Model(&model.Uploads{}).Select("id, upload_url, file_url, file_name, upload_id, upload_url").Where("user_id = ? AND id <= ? AND id >= ?", userClaims.Uid, limit, limit-10).Order("id desc").Limit(limit).Scan(&result)
+	// db.Model(&model.Uploads{}).Select("id, upload_url, file_url, file_name, upload_id, upload_url").Where("user_id = ? AND id <= ? AND id >= ?", userClaims.Uid, limit, limit-10).Order("id desc").Limit(limit).Scan(&result)
+	db.Model(&model.Uploads{}).Select("id, upload_url, file_url, file_name, upload_id, upload_url").Where("user_id = ?", userClaims.Uid).Scan(&result)
 	query := db.Model(&model.Uploads{}).Select("id").Where("user_id = ?", userClaims.Uid).Scan(&all)
 	float, _ := strconv.ParseFloat(fmt.Sprintf("%v", query.RowsAffected/10), 64)
 	maxPages := math.Floor(float) + 1
