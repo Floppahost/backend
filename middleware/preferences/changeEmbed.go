@@ -24,7 +24,7 @@ func ChangeEmbed(c *fiber.Ctx) error {
 
 	token := c.Cookies("token")
 
-	err := database.UpdateEmbed(token, parser.SiteName, parser.SiteName, parser.Title, parser.Description, parser.Author, parser.Author, parser.Color)
+	err := database.UpdateEmbed(token, parser.SiteName, parser.SiteNameUrl, parser.Title, parser.Description, parser.Author, parser.AuthorUrl, parser.Color)
 
 	if err != nil {
 		status, errMsg := handler.Errors(err)

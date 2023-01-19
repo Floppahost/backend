@@ -213,7 +213,7 @@ func Upload(site_name string, site_name_url string, title string, description st
 		return errors.New("unauthorized")
 	}
 
-	upload := model.Uploads{MimeType: mime_type, Path: path, Author: author, AuthorUrl: author, Title: title, SiteName: site_name, SiteNameUrl: site_name_url, Description: description, Color: color, UserID: userid, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url, UploadID: upload_id}
+	upload := model.Uploads{MimeType: mime_type, Path: path, Author: author, AuthorUrl: author_url, Title: title, SiteName: site_name, SiteNameUrl: site_name_url, Description: description, Color: color, UserID: userid, FileName: fileName, UploadUrl: upload_url, FileUrl: file_url, UploadID: upload_id}
 	query := db.Create(&upload)
 
 	if query.Error != nil {
