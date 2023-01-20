@@ -160,7 +160,7 @@ func Upload(c *fiber.Ctx) error {
 		upload_url = path
 	}
 	file_url := fmt.Sprintf("%s/files/%s", os.Getenv("BUCKET_ENDPOINT"), objectName)
-	upload_url = fmt.Sprintf("%s/#/file/%s", domain, path)
+	upload_url = fmt.Sprintf("%s/%s", domain, path)
 
 	endTime := time.Since(startTime)
 	embedFields := lib.EmbedPlaceholders(site_name(), site_name_url(), title(), description(), author(), author_url(), apikey, fileSize, fileName, endTime)
