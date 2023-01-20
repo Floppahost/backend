@@ -14,7 +14,7 @@ type Embeds struct {
 	Author      string `gorm:"default:Floppa"`
 	AuthorUrl   string `gorm:"default:https://floppa.host"`
 	Color       string `gorm:"default:random"`
-	Domain      string `gorm:"default:floppa.host"`
+	Domain      string `gorm:"default:i.floppa.host"`
 	Path        string
 	Path_Mode   string `gorm:"not null;default:invisible"`
 	Path_Amount int    `gorm:"not null;default:5"`
