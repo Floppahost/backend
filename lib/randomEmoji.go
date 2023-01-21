@@ -23,7 +23,7 @@ func RandomEmoji(size int) string {
 		min := r[0]
 		max := r[1]
 		n := rand.Intn(max-min+1) + min
-		str = str + html.UnescapeString("&#"+strconv.Itoa(n)+";") + InvisibleUrl(int(math.Round(float64(16/size))))
+		str = str + html.UnescapeString("&#"+strconv.Itoa(n)+";") + InvisibleUrl(int(math.Round(float64(25/size))))
 	}
 	return str
 }

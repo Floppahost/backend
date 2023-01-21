@@ -150,10 +150,10 @@ func Upload(c *fiber.Ctx) error {
 		path = lib.RandomEmoji(int(path_amount))
 		upload_url = path
 	case "invisible":
-		path = lib.InvisibleUrl(15)
+		path = lib.InvisibleUrl(25)
 		upload_url = path
 	case "custom":
-		path = path_value() + lib.InvisibleUrl(15)
+		path = path_value() + lib.InvisibleUrl(25)
 		upload_url = path
 	default:
 		path = generated_uuid
