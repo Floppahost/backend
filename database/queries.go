@@ -301,7 +301,7 @@ func GetDomains(token string) ([]map[string]any, error) {
 	}
 
 	result := []map[string]any{}
-	db.Raw("SELECT domain, wildcard, username FROM domains INNER JOIN users ON domains.by_uid = users.id").Find(&result)
+	db.Raw("SELECT domain, wildcard, username FROM domains LEFT JOIN users ON domains.by_uid = users.id").Find(&result)
 
 	fmt.Println(result)
 	return result, nil
