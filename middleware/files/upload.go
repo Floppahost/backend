@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/AvraamMavridis/randomcolor"
+	"github.com/dustin/go-humanize"
 	"github.com/floppahost/backend/buck"
 	"github.com/floppahost/backend/database"
 	"github.com/floppahost/backend/lib"
@@ -59,7 +60,7 @@ func Upload(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": true, "message": "something weird happened. Please, try again; if the error persists, contact the support"})
 	}
 
-	fileSize := file.Size
+	fileSize := humanize.Bytes(uint64(file.Size))
 	os.Remove(fsPath)
 
 	embed, err := database.GetEmbed(apikey)

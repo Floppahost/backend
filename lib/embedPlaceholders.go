@@ -9,7 +9,7 @@ import (
 	"github.com/floppahost/backend/model"
 )
 
-func EmbedPlaceholders(site_name string, site_name_url string, title string, description string, author string, author_url string, token string, fileSize int64, fileName string, delay time.Duration) model.EmbedStruct {
+func EmbedPlaceholders(site_name string, site_name_url string, title string, description string, author string, author_url string, token string, fileSize string, fileName string, delay time.Duration) model.EmbedStruct {
 	var placeholders [6]string
 
 	placeholders[0] = "$user$"
