@@ -458,7 +458,7 @@ func ValidateUpload(token string, upload string) (model.UserValidation, error) {
 	return userClaims, nil
 }
 
-func GetInvites(token string) ([]map[string]any, error) {
+func GetInvites(token string,) ([]map[string]any, error) {
 	db := DB
 	userClaims := VerifyUser(token)
 
@@ -468,7 +468,7 @@ func GetInvites(token string) ([]map[string]any, error) {
 
 	result := []map[string]any{}
 
-	db.Raw("SELECT code, username FROM invites LEFT JOIN users ON invites.used_by_id = users.id").Find(&result)
+	db.Raw("SELECT code, username FROM invites LEFT JOIN users ON invites.used_by_id = users.id WHERE user_id = ?", userClaims.Uid).Find(&result)
 	return result, nil
 }
 
