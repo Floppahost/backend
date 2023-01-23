@@ -241,7 +241,7 @@ func GetEmbed(token string) (map[string]any, error) {
 	}
 
 	result := map[string]any{}
-	db.Model(&model.Embeds{}).Where("user_id = ?", userClaims.Uid).Find(&result)
+	db.Model(&model.Embeds{}).Select("author, author_url, site_name, site_name_url, description, color, title, path_mode, path, path_amount, domain").Where("user_id = ?", userClaims.Uid).Find(&result)
 
 	if len(result) == 0 {
 		return nil, errors.New("unauthorized")
