@@ -468,8 +468,7 @@ func GetInvites(token string) ([]map[string]any, error) {
 
 	result := []map[string]any{}
 
-	// dont work for unused invites
-	db.Raw("SELECT code, username FROM invites INNER JOIN users ON invites.used_by_id = users.id").Find(&result)
+	db.Raw("SELECT code, username FROM invites LEFT JOIN users ON invites.used_by_id = users.id").Find(&result)
 	return result, nil
 }
 
