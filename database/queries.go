@@ -260,7 +260,7 @@ func UpdateEmbed(token string, site_name string, site_name_url string, title str
 
 	uid := userClaims.Uid
 
-	db.Model(&model.Embeds{}).Where("user_id = ?", uid).Updates(model.Embeds{SiteName: site_name, SiteNameUrl: site_name_url, Title: title, Description: description, Author: author, AuthorUrl: author_url})
+	db.Model(&model.Embeds{}).Where("user_id = ?", uid).Updates(model.Embeds{Color: color, SiteName: site_name, SiteNameUrl: site_name_url, Title: title, Description: description, Author: author, AuthorUrl: author_url})
 	return nil
 }
 
