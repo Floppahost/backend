@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"regexp"
 
 	"github.com/floppahost/backend/database"
@@ -30,7 +29,7 @@ func Register(c *fiber.Ctx) error {
 	test_email := re.FindAllString(parser.Email, -1)
 	test_password := re.FindAllString(parser.Password, -1)
 	if len(test_username) > 0 || len(test_email) > 0 || len(test_password) > 0 {
-		fmt.Println("invalid characters on username, email or password")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "invalid characters on username, email or password"})
 	}
 	token, err := database.Register(parser.Username, parser.Password, parser.Email, parser.Invite)
 
