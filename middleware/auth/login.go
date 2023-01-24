@@ -16,6 +16,7 @@ type Req struct {
 }
 
 func Login(c *fiber.Ctx) error {
+	
 	// declaramos o tipo do parser
 	parser := new(Req)
 	// verificamos se há erros no BodyParser
