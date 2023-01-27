@@ -31,7 +31,10 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&fiber.Cookie{
+		SameSite: "none",
 		Name:     "token",
+		Domain:   ".floppa.host",
+		Path:     "/",
 		Value:    token,
 		Secure:   true,
 		HTTPOnly: true,

@@ -39,9 +39,10 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&fiber.Cookie{
+		SameSite: "none",
+		Name:     "token",
 		Domain:   ".floppa.host",
 		Path:     "/",
-		Name:     "token",
 		Value:    token,
 		Secure:   true,
 		HTTPOnly: true,
