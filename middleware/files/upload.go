@@ -164,7 +164,7 @@ func Upload(c *fiber.Ctx) error {
 	upload_url = fmt.Sprintf("%s/%s", domain, path)
 
 	endTime := time.Since(startTime)
-	embedFields := lib.EmbedPlaceholders(site_name(), site_name_url(), title(), description(), author(), author_url(), apikey, fileSize, fileName, endTime)
+	embedFields := lib.EmbedPlaceholders(site_name(), site_name_url(), title(), description(), author(), author_url(), apikey, fileSize, fileName, endTime, path)
 
 	urlEscape := url.QueryEscape(path)
 	err = database.Upload(embedFields.SiteName, embedFields.SiteNameUrl, embedFields.Title, embedFields.Description, embedFields.Author, embedFields.AuthorUrl, color, userClaims.Uid, fileName, file_url, upload_url, urlEscape, objectName, apikey, fileHeader)

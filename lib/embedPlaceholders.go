@@ -9,8 +9,8 @@ import (
 	"github.com/floppahost/backend/model"
 )
 
-func EmbedPlaceholders(site_name string, site_name_url string, title string, description string, author string, author_url string, token string, fileSize string, fileName string, delay time.Duration) model.EmbedStruct {
-	var placeholders [6]string
+func EmbedPlaceholders(site_name string, site_name_url string, title string, description string, author string, author_url string, token string, fileSize string, fileName string, delay time.Duration, path string) model.EmbedStruct {
+	var placeholders [7]string
 
 	placeholders[0] = "$user$"
 	placeholders[1] = "$uploads$"
@@ -18,17 +18,18 @@ func EmbedPlaceholders(site_name string, site_name_url string, title string, des
 	placeholders[3] = "$size$"
 	placeholders[4] = "$filename$"
 	placeholders[5] = "$uid$"
+	placeholders[6] = "$path$"
 	uploadCounter, _ := database.GetUploadCounter(token)
 	userClaims := database.VerifyUser(token)
 
-	var values [6]any
+	var values [7]any
 	values[0] = userClaims.Username
 	values[1] = uploadCounter + 1 // plus one counting this upload
 	values[2] = delay
 	values[3] = fileSize
 	values[4] = fileName
 	values[5] = userClaims.Uid
-
+	values[6] = path
 	substituteValue := func(str string) string {
 		newStr := str
 		for i := 0; len(placeholders) > i; i++ {
