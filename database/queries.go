@@ -37,7 +37,7 @@ func Login(username string, password string) (string, error) {
 	result := map[string]any{}
 
 	// we make a query, getting the password and id
-	db.Model(&model.Users{}).Select("password, id, token, blacklist").Where("username = ? OR email = ?", username, username).Find(&result)
+	db.Model(&model.Users{}).Select("password, id, token, blacklist").Where("username iLIKE ? OR email iLIKE ?", username, username).Find(&result)
 
 	// Em SQL: SELECT senha, id FROM users WHERE usuario=usuario
 	// we pass the hashedPass to string
