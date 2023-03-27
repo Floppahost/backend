@@ -1,3 +1,5 @@
+# This repository is now archived, meaning we do not provide support for this anymore.
+
 # 🚧 API Routes
 
 ## `[POST] /login`
